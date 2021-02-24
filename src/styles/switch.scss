@@ -1,0 +1,29 @@
+// @ts-nocheck
+.hm-switch {
+  display: inline-block;
+  &-btn {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 40px;
+    height: 20px;
+    border-radius: 20px;
+    padding: 2px;
+    border-color: 'rgb(19, 206, 102)';
+    background-color: 'rgb(19, 206, 102)';
+    box-sizing: border-box
+  }
+  &-thumb {
+    position: absolute;
+    right: 2px;
+    // margin-left: 20px;
+    border-radius: 100%;
+    transition: all .3s;
+    width: 16px;
+    height: 16px;
+    background-color: #fff;
+  }
+  .checked {
+    color: ''
+  }
+}

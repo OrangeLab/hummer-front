@@ -1,0 +1,12 @@
+// @ts-nocheck
+.hm-default.hm-text {
+  display: inline-block;
+  white-space: nowrap;
+  overflow: hidden;
+  max-width: 100%;
+  //overflow: hidden;
+  //text-overflow: ellipsis;
+  //display: -webkit-box;
+  //-webkit-line-clamp: attr(line);
+  //-webkit-box-orient: vertical;
+}

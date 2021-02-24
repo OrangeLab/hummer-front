@@ -1,0 +1,36 @@
+// @ts-nocheck
+
+@import "list";
+@import "switch";
+@import "text";
+body {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+div, button, input, textarea, span, image{
+  padding: 0;
+  margin: 0;
+  border: none;
+  box-sizing: border-box;
+  font-size: 16px;
+}
+button {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  outline: none;
+  background-color: #ffffff;
+}
+.hm-default {
+  display: flex;
+  position: relative;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.hm-default-inline {
+  display: inline;
+  position: relative;
+  text-align: center;
+}

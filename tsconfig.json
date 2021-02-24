@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "sourceMap": false,
+    "outDir": "dist",
+    "target": "es6",
+    "module": "esnext",
+    "moduleResolution": "node",
+    "allowJs": false,
+    "strict": false,
+    "noUnusedLocals": true,
+    "experimentalDecorators": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "removeComments": true,
+    "jsx": "preserve",
+    "lib": ["esnext", "dom"],
+    "types": ["jest", "puppeteer", "node"],
+    "paths": {
+    },
+    "declaration": true,
+    "declarationDir": "dist/@types",
+    "allowSyntheticDefaultImports": true,
+  },
+  "include": [
+    "./src",
+  ]
+}
