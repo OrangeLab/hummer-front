@@ -17,7 +17,6 @@ let questionsOne = [{
 
 inquirer.prompt(questionsOne).then(answers => {
   var type = answers.type
-  console.log(type)
 
   if (type !== 'unwanted') {
     // 变更版本
@@ -33,7 +32,11 @@ inquirer.prompt(questionsOne).then(answers => {
     execa.sync('npm', ['config', 'set', 'registry', 'https://registry.npmjs.org/']);
     var { stderr } = child_process.spawnSync('npm', ['publish']);
     console.log('\x1B[46m%s\x1B[0m', stderr);
-    console.log('\x1B[42m%s\x1B[0m', 'npm源发布成功');
+    if (stderr.indexOf('ERR') > -1) {
+      console.log('\x1B[31m%s\x1B[0m', 'npm源发布失败请检查错误信息');
+    } else {
+      console.log('\x1B[42m%s\x1B[0m', 'npm源发布成功');
+    }
   }catch(error){
     console.log('\x1B[31m%s\x1B[0m', error.message);
   }
