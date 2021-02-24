@@ -2,9 +2,6 @@ import { Environment } from './Environment';
 import { NotifyCenter } from '../component/NotifyCenter';
 export declare class HummerGlobal {
     setTitle(setTitle: string): any;
-    safeGuardDisplay(isDisplay: boolean): any;
-    layoutSafeGuard(left: number, bottom: number): any;
-    updateOrderInfo(info: any): any;
     setNavigationBarMode(mode: number): any;
     setNavigationBarColor(color: string): any;
     setScrollTracker(view: any, options: any): any;

@@ -1,7 +1,7 @@
 {
-	"name": "hummer-front",
+	"name": "@hummer/hummer-front",
 	"version": "1.0.0",
-	"description": "hummer-front",
+	"description": "@hummer/hummer-front",
 	"main": "dist/index.js",
 	"types": "dist/@types/index.d.ts",
 	"typings": "dist/@types/index.d.ts",
@@ -17,6 +17,10 @@
 	"repository": {
 		"type": "git",
 		"url": "git@github.com:OrangeLab/hummer-front.git"
+	},
+	"publishConfig": {
+		"registry": "https://registry.npmjs.org/",
+		"access": "public"
 	},
 	"license": "ISC",
 	"dependencies": {

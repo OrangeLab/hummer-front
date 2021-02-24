@@ -52,9 +52,6 @@ class HummerGlobal {
         this.pageInfo = {};
     }
     setTitle(setTitle) { }
-    safeGuardDisplay(isDisplay) { }
-    layoutSafeGuard(left, bottom) { }
-    updateOrderInfo(info) { }
     setNavigationBarMode(mode) { }
     setNavigationBarColor(color) { }
     setScrollTracker(view, options) { }
@@ -113,12 +110,6 @@ class KeyframeAnimation {
     }
 }
 
-const KopHttpClient = {
-    post(req, suc, fail) { },
-    download(req, suc, fail) { },
-    upload(req, suc, fail) { }
-};
-
 const Location = {
     getLastLocation(callback) { },
     startLocation(callback, intervalTime, intervalDistance) { },
@@ -142,13 +133,6 @@ const Navigator = {
     popToRootPage: (options) => { },
     popBack: (count, options) => { }
 };
-
-class NumberSecurity {
-    init() { }
-    preCall() { }
-    makeCall() { }
-    showRebindDialog() { }
-}
 
 const Phone = {
     call(phoneNum, callback) { }
@@ -3584,69 +3568,6 @@ class View {
             default:
                 return value;
         }
-    }
-}
-
-class Banner extends View {
-    constructor() {
-        super();
-        this._style = this._style = new Proxy(this._style, {
-            get: (target, key) => {
-                return target[key] || this.node.style[key];
-            },
-            set: (target, key, value) => {
-                target[key] = value;
-                this.node.style[key] = value;
-                return true;
-            }
-        });
-    }
-    createNode() {
-        this.node = document.createElement('div');
-    }
-    get style() {
-        return this._style;
-    }
-    set style(_style) {
-        this._style = Object.assign(this._style, _style);
-    }
-    setCurrentItem(position) { }
-    onPageChange(callback) {
-        callback();
-    }
-    onItemClick(callback) {
-        callback();
-    }
-    onItemView(callback) {
-        callback();
-    }
-    onPageScroll(callback) {
-        callback();
-    }
-    onPageScrollStateChange(callback) {
-        callback();
-    }
-    setItemViewsArray(itemViewsInfo) {
-        let { flag, components } = itemViewsInfo;
-        let hasExist = false;
-        this.itemViewsArray.forEach(element => {
-            if (element.flag === flag) {
-                hasExist = true;
-                element.components = components;
-            }
-        });
-        if (!hasExist) {
-            this.itemViewsArray.push(itemViewsInfo);
-        }
-        this.updateItemViews();
-    }
-    updateItemViews() {
-        let itemViews = [];
-        this.itemViewsArray.forEach(element => {
-            itemViews = itemViews.concat(element.components);
-        });
-        this.itemViews = itemViews;
-        this.data = new Array[this.itemViews.length]();
     }
 }
 
@@ -8208,4 +8129,4 @@ class ViewPager extends View {
     }
 }
 
-export { Banner, BasicAnimation, Button, Carousel, Dialog, Environment, Event, HorizontalScroller, Hummer, HummerGlobal, INPUT_SIZE_STYLE, Image, ImagePicker, Input, InputEvent, InputState, KeyframeAnimation, KopHttpClient, List, Location, LongPressEvent, LongPressState, Memory, Navigator, NotifyCenter, NumberSecurity, PanEvent, PanState, Phone, PinchEvent, PinchState, Request, Response, SIZE_STYLE, ScrollEvent, ScrollState, Scroller, Storage, SwipeEvent, SwipeState, Switch, SwitchEvent, TapEvent, TapState, Text, TextArea, Timer, Toast, TouchEvent, TouchState, View, ViewPager, WebSocket };
+export { BasicAnimation, Button, Carousel, Dialog, Environment, Event, HorizontalScroller, Hummer, HummerGlobal, INPUT_SIZE_STYLE, Image, ImagePicker, Input, InputEvent, InputState, KeyframeAnimation, List, Location, LongPressEvent, LongPressState, Memory, Navigator, NotifyCenter, PanEvent, PanState, Phone, PinchEvent, PinchState, Request, Response, SIZE_STYLE, ScrollEvent, ScrollState, Scroller, Storage, SwipeEvent, SwipeState, Switch, SwitchEvent, TapEvent, TapState, Text, TextArea, Timer, Toast, TouchEvent, TouchState, View, ViewPager, WebSocket };
