@@ -10,9 +10,9 @@
 	],
 	"scripts": {
 		"build": "node ./script/build.js",
-		"_____comment": "npm run git -- 'commit-msg'  so you can push and update by a auto way",
+		"comment": "npm run git -- 'commit-msg'  so you can push and update by a auto way",
 		"git": "npm run build && git add . && git commit -m",
-		"publish": "node ./script/publish.js"
+		"release": "node ./script/publish.js"
 	},
 	"repository": {
 		"type": "git",
