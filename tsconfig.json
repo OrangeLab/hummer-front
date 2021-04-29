@@ -15,7 +15,6 @@
     "removeComments": true,
     "jsx": "preserve",
     "lib": ["esnext", "dom"],
-    "types": ["jest", "puppeteer", "node"],
     "paths": {
     },
     "declaration": true,
