@@ -10,11 +10,12 @@ export interface ListStyle extends ViewStyle {
     rightSpacing?: number | string;
     topSpacing?: number | string;
     bottomSpacing?: number | string;
-    showScrollBar?: boolean;
 }
 export declare class List extends View {
     refreshView: View;
     loadMoreView: View;
+    showScrollBar: boolean;
+    bounces: boolean;
     protected _style: ListStyle;
     private rowCount;
     private _listRows;

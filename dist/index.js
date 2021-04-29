@@ -7420,6 +7420,8 @@ var BScroll = /*#__PURE__*/Object.freeze({
 class List extends View {
     constructor() {
         super();
+        this.showScrollBar = false;
+        this.bounces = false;
         this._listRows = [];
         this._gridRows = [];
         this._waterfalls = [];

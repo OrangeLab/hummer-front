@@ -15,13 +15,13 @@ export interface ListStyle extends ViewStyle {
   rightSpacing?: number | string
   topSpacing?: number | string
   bottomSpacing?: number | string
-  showScrollBar?: boolean
 }
 
 export class List extends View {
   refreshView!: View
   loadMoreView!: View
-
+  showScrollBar: boolean = false // 滑动时是否显示滚动条
+  bounces: boolean = false // 滑动到 边缘时是否有回弹效果
   protected _style: ListStyle
 
   private rowCount!: number
