@@ -47,7 +47,7 @@ export class Text extends View {
   }
 
   protected createNode() {
-    this.node = document.createElement('span')
+    this.node = document.createElement('div')
   }
 
   get text() {

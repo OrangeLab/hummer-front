@@ -15,7 +15,15 @@ let conf = createConfig('', {
   format: `es`
 })
 
-export default conf
+// export default conf
+export default [createConfig('', {
+  file: path.resolve(targetDir, `dist/index.js`),
+  format: `es`
+}), createConfig("iife", {
+  file: path.resolve(targetDir, `dist/index-browser.js`),
+  format: `iife`,
+  name: '__GLOBAL__'
+})]
 
 
 
@@ -23,7 +31,7 @@ function createConfig(format, output, plugins = []) {
   const entryFile =  `index.ts` 
   // output.sourcemap = true
   output.externalLiveBindings = false
-  output.name = `index.${format}`
+  output.name = output.name || `index.${format}`
 
   const tsPlugin = ts({
     check: true,
