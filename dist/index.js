@@ -3941,6 +3941,42 @@ class Input extends View {
     }
 }
 
+class List extends View {
+    constructor() {
+        super();
+        this.showScrollBar = false;
+        this.bounces = false;
+    }
+    get style() {
+        return this._style;
+    }
+    set style(_style) {
+        this._style = Object.assign(this._style, _style);
+    }
+    refresh(count) {
+    }
+    scrollTo(x, y) {
+    }
+    scrollBy(dx, dy) {
+    }
+    scrollToTop() {
+    }
+    scrollToBottom() {
+    }
+    setOnScrollToTopListener() {
+    }
+    setOnScrollToBottomListener() {
+    }
+    stopPullRefresh() {
+    }
+    stopLoadMore(enable) {
+    }
+    addEventListener(key, listener) {
+    }
+    removeEventListener(key, listener) {
+    }
+}
+
 class Scroller extends View {
     constructor() {
         super();
@@ -4246,4 +4282,4 @@ class ViewPager extends View {
     }
 }
 
-export { BasicAnimation, Button, Carousel, Dialog, Environment, Event, HorizontalScroller, Hummer, HummerGlobal, INPUT_SIZE_STYLE, Image, ImagePicker, Input, InputEvent, InputState, KeyframeAnimation, Location, LongPressEvent, LongPressState, Memory, Navigator, NotifyCenter, PanEvent, PanState, Phone, PinchEvent, PinchState, Request, Response, SIZE_STYLE, ScrollEvent, ScrollState, Scroller, Storage, SwipeEvent, SwipeState, Switch, SwitchEvent, TapEvent, TapState, Text, TextArea, Timer, Toast, TouchEvent, TouchState, View, ViewPager, WebSocket };
+export { BasicAnimation, Button, Carousel, Dialog, Environment, Event, HorizontalScroller, Hummer, HummerGlobal, INPUT_SIZE_STYLE, Image, ImagePicker, Input, InputEvent, InputState, KeyframeAnimation, List, Location, LongPressEvent, LongPressState, Memory, Navigator, NotifyCenter, PanEvent, PanState, Phone, PinchEvent, PinchState, Request, Response, SIZE_STYLE, ScrollEvent, ScrollState, Scroller, Storage, SwipeEvent, SwipeState, Switch, SwitchEvent, TapEvent, TapState, Text, TextArea, Timer, Toast, TouchEvent, TouchState, View, ViewPager, WebSocket };

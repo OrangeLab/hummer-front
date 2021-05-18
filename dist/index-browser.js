@@ -3944,6 +3944,42 @@ var __GLOBAL__ = (function (exports) {
       }
   }
 
+  class List extends View {
+      constructor() {
+          super();
+          this.showScrollBar = false;
+          this.bounces = false;
+      }
+      get style() {
+          return this._style;
+      }
+      set style(_style) {
+          this._style = Object.assign(this._style, _style);
+      }
+      refresh(count) {
+      }
+      scrollTo(x, y) {
+      }
+      scrollBy(dx, dy) {
+      }
+      scrollToTop() {
+      }
+      scrollToBottom() {
+      }
+      setOnScrollToTopListener() {
+      }
+      setOnScrollToBottomListener() {
+      }
+      stopPullRefresh() {
+      }
+      stopLoadMore(enable) {
+      }
+      addEventListener(key, listener) {
+      }
+      removeEventListener(key, listener) {
+      }
+  }
+
   class Scroller extends View {
       constructor() {
           super();
@@ -4264,6 +4300,7 @@ var __GLOBAL__ = (function (exports) {
   exports.Input = Input;
   exports.InputEvent = InputEvent;
   exports.KeyframeAnimation = KeyframeAnimation;
+  exports.List = List;
   exports.Location = Location;
   exports.LongPressEvent = LongPressEvent;
   exports.Memory = Memory;
