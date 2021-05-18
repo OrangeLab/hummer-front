@@ -1,4 +1,4 @@
-import * as Hammer from 'hammerjs'
+import Hammer from 'hammerjs'
 import { EventListener } from '../event/Event'
 import { InputEvent, InputState } from '../event/InputEvent'
 import { PanEvent, PanState } from '../event/PanEvent'
@@ -9,8 +9,8 @@ import { LongPressEvent, LongPressState } from '../event/LongPressEvent'
 import { ScrollEvent } from '../event/ScrollEvent'
 import { BasicAnimation } from '../BasicAnimation'
 import { KeyframeAnimation } from '../KeyframeAnimation'
-import { formatUnit } from '../../common/utils'
 
+import {styleTransformer} from '../../common/style'
 export const SIZE_STYLE: Array<any> = [
   'top',
   'left',
@@ -161,37 +161,10 @@ export class View {
       {},
       {
         get: (target, key) => {
-          // 获取style
-          // @ts-ignore
           return target[key] || this.node.style[key]
         },
         set: (target, key, value) => {
-          // 设置style
-          switch (key) {
-            case 'backgroundColor':
-              const reg = /gradient/
-              // @ts-ignore
-              target[key] = value
-              reg.test(value)
-                ? (this.node.style['background'] = '-webkit-' + value)
-                : (this.node.style[key] = value)
-              break
-            case 'shadow':
-              // @ts-ignore
-              target[key] = value
-              this.node.style['boxShadow'] = value
-              break
-            default:
-              if (SIZE_STYLE.includes(key)) {
-                // @ts-ignore
-                target[key] = formatUnit(value)
-                this.node.style[key] = formatUnit(value)
-              } else {
-                // @ts-ignore
-                target[key] = value
-                this.node.style[key] = value
-              }
-          }
+          this.node.style[key] = value
           return true
         }
       }
@@ -200,11 +173,11 @@ export class View {
     this.initialize()
   }
   protected defaultStyle() {
-    this.node.classList.add('hm-default')
+    this.node.classList.add('hm-default-view')
   }
 
   protected createNode() {
-    this.node = document.createElement('div')
+    this.node = document.createElement('view')
   }
 
   get enabled() {
@@ -225,7 +198,8 @@ export class View {
   }
 
   set style(_style: ViewStyle) {
-    this._style = Object.assign(this._style, _style)
+    let standardStyle = styleTransformer.transformStyle(_style);
+    this._style = Object.assign(this._style, standardStyle)
   }
 
   /**

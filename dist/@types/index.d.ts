@@ -1,3 +1,4 @@
+import './styles/index.scss';
 export * from './base/Environment';
 export * from './base/Global';
 export * from './component/BasicAnimation';

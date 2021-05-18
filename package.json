@@ -2,14 +2,19 @@
 	"name": "@hummer/hummer-front",
 	"version": "1.0.3",
 	"description": "@hummer/hummer-front",
-	"main": "dist/index.js",
+	"main": "dist/dokit.js",
+	"unpkg": "dist/index-browser.js",
+	"jsdelivr": "dist/index-browser.js",
 	"types": "dist/@types/index.d.ts",
 	"typings": "dist/@types/index.d.ts",
 	"files": [
 		"dist"
 	],
 	"scripts": {
-		"build": "node ./script/build.js",
+		"build": "NODE_ENV=production node ./script/build.js",
+		"dev": "node ./script/dev.js",
+		"dev:example": "npm run dev & npm run example",
+		"example": "node ./script/playground.js",
 		"comment": "npm run git -- 'commit-msg'  so you can push and update by a auto way",
 		"git": "npm run build && git add . && git commit -m",
 		"release": "node ./script/publish.js"
@@ -28,12 +33,23 @@
 		"hammerjs": "^2.0.8"
 	},
 	"devDependencies": {
-		"rollup": "^2.16.1",
-		"rollup-plugin-typescript2": "^0.27.1",
+		"@rollup/plugin-commonjs": "^19.0.0",
+		"@rollup/plugin-node-resolve": "^13.0.0",
 		"@rollup/plugin-strip": "^2.0.0",
+		"@types/hammerjs": "^2.0.39",
 		"execa": "^4.0.3",
 		"fs-extra": "^9.0.1",
 		"inquirer": "^7.3.3",
+		"node-sass": "^6.0.0",
+		"open": "^8.0.9",
+		"postcss": "^8.2.15",
+		"rollup": "^2.16.1",
+		"rollup-plugin-node-builtins": "^2.1.2",
+		"rollup-plugin-node-globals": "^1.4.0",
+		"rollup-plugin-postcss": "^4.0.0",
+		"rollup-plugin-terser": "^7.0.2",
+		"rollup-plugin-typescript2": "^0.27.1",
+		"serve-handler": "^6.1.3",
 		"typescript": "^3.9.3"
 	},
 	"keywords": [

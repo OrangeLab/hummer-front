@@ -1,5 +1,4 @@
 import { View, ViewStyle } from './View'
-import { formatUnit } from '../../common/utils'
 
 export interface TextStyle extends ViewStyle {
   color?: string
@@ -21,33 +20,14 @@ export class Text extends View {
   constructor() {
     super()
     this.node.classList.add('hm-text')
-    // @ts-ignore
-    this._style = new Proxy(this._style, {
-      get: (target, key) => {
-        // 获取style
-        // @ts-ignore
-        return target[key] || this.node.style[key]
-      },
-      set: (target, key, value) => {
-        // 设置style
-        // @ts-ignore
-        target[key] = value
-        switch (key) {
-          case 'textLineClamp':
-            target[key] = value
-            break
-          case 'fontSize':
-            // @ts-ignore
-            target[key] = formatUnit(value)
-            this.node.style[key] = formatUnit(value)
-        }
-        return true
-      }
-    })
+  }
+
+  protected defaultStyle() {
+    this.node.classList.add('hm-default-text')
   }
 
   protected createNode() {
-    this.node = document.createElement('div')
+    this.node = document.createElement('text')
   }
 
   get text() {
@@ -72,13 +52,5 @@ export class Text extends View {
 
   set formattedText(value: string) {
     this.node.innerHTML = value
-  }
-
-  get style() {
-    return this._style
-  }
-
-  set style(_style: TextStyle) {
-    this._style = Object.assign(this._style, _style)
   }
 }

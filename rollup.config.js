@@ -1,13 +1,14 @@
 import path from 'path'
 import ts from 'rollup-plugin-typescript2'
 import strip from '@rollup/plugin-strip';
+import postcss from 'rollup-plugin-postcss';
+import { terser } from "rollup-plugin-terser";
 
 // const packagesDir = path.resolve(__dirname, 'packages')
 const targetDir = path.resolve(__dirname)
 
-
 const srcDir = path.resolve(targetDir, 'src')
-const resolve = p => path.resolve(srcDir, p) 
+const resolve = p => path.resolve(srcDir, p)
 
 
 let conf = createConfig('', {
@@ -28,11 +29,8 @@ export default [createConfig('', {
 
 
 function createConfig(format, output, plugins = []) {
-  const entryFile =  `index.ts` 
-  // output.sourcemap = true
-  output.externalLiveBindings = false
-  output.name = output.name || `index.${format}`
-
+  const entryFile = `index.ts`
+  output.sourcemap = true
   const tsPlugin = ts({
     check: true,
     tsconfig: path.resolve(targetDir, 'tsconfig.json'),
@@ -43,15 +41,36 @@ function createConfig(format, output, plugins = []) {
       declarationDir: 'dist',
     }
   })
+  const nodePlugins = format !== 'cjs'
+    ? [
+      require('@rollup/plugin-node-resolve').nodeResolve({
+        preferBuiltins: true
+      }),
+      require('@rollup/plugin-commonjs')({
+        sourceMap: false
+      }),
+      require('rollup-plugin-node-builtins')(),
+      require('rollup-plugin-node-globals')()
+    ]
+    : []
+  const cssPlugins = [postcss({
+    extract: true,
+    modules: false,
+    use: ['sass'],
+  })]
+
+  const terserPlugin = process.env.NODE_ENV === 'production'?[terser(), strip({
+    include: ['**/*.ts'],
+    functions: ['console.*'],
+  })]:[]
 
   return {
     input: resolve(entryFile),
     plugins: [
       tsPlugin,
-      strip({
-        include: ['**/*.ts'],
-        functions: ['console.*'],
-      })
+      ...nodePlugins,
+      ...cssPlugins,
+      ...terserPlugin
     ],
     output,
     onwarn: (warn) => {

@@ -368,11 +368,15 @@ class TouchEvent extends Event {
     }
 }
 
+var hammer = {exports: {}};
+
 /*! Hammer.JS - v2.0.7 - 2016-04-22
  * http://hammerjs.github.io/
  *
  * Copyright (c) 2016 Jorik Tangelder;
  * Licensed under the MIT license */
+
+(function (module) {
 (function(window, document, exportName, undefined$1) {
 
 var VENDOR_PREFIXES = ['', 'webkit', 'Moz', 'MS', 'ms', 'o'];
@@ -2999,32 +3003,104 @@ assign(Hammer, {
 var freeGlobal = (typeof window !== 'undefined' ? window : (typeof self !== 'undefined' ? self : {})); // jshint ignore:line
 freeGlobal.Hammer = Hammer;
 
-if (typeof define === 'function' && define.amd) {
-    define(function() {
+if (typeof undefined$1 === 'function' && undefined$1.amd) {
+    undefined$1(function() {
         return Hammer;
     });
-} else if (typeof module != 'undefined' && module.exports) {
+} else if (module.exports) {
     module.exports = Hammer;
 } else {
     window[exportName] = Hammer;
 }
 
 })(window, document, 'Hammer');
+}(hammer));
 
-var Hammer = /*#__PURE__*/Object.freeze({
-  __proto__: null
-});
+var Hammer = hammer.exports;
+
+function toKebabCase(key) {
+    return key.replace(/[A-Z]/g, ($0, offset) => {
+        return (offset === 0 ? '' : '-') + $0.toLowerCase();
+    });
+}
 
 function formatUnit(size) {
-    const deviceWidth = +Hummer.env.deviceWidth.replace('dp', '');
-    if (typeof size === 'number') {
-        return deviceWidth * (size / Hummer.env.remUEWidthInPixel) + 'px';
-    }
-    else if (typeof size === 'string') {
-        return size.replace('dp', 'px');
-    }
-    return size;
+    console.log('size', size);
+    return `${size}px`;
 }
+function makeMapByArrOfKebab(list) {
+    const map = Object.create(null);
+    for (let i = 0; i < list.length; i++) {
+        map[list[i]] = true;
+    }
+    return (val) => !!map[toKebabCase(val)];
+}
+
+const unitAttrs = [
+    'font-size', 'placeholder-font-size',
+    'flex-basis',
+    'width', 'max-width', 'min-width', 'height', 'max-height', 'min-height',
+    'padding', 'padding-left', 'padding-right', 'padding-bottom', 'padding-top',
+    'margin', 'margin-left', 'margin-right', 'margin-bottom', 'margin-top',
+    'left', 'right', 'top', 'bottom',
+    'border-width', 'border-left-width', 'border-right-width', 'border-top-width', 'border-bottom-width',
+    'border-radius', 'border-top-left-radius', 'border-top-right-radius', 'border-bottom-left-radius', 'border-bottom-right-radius'
+];
+const isNeedUnitTrasform = makeMapByArrOfKebab(unitAttrs);
+const isHmUnit = /hm$/;
+const isPecentUnit = /%$/;
+const isStaticNumber = /^\d+$/;
+function transformUnit(style) {
+    Object.keys(style).forEach(key => {
+        if (isNeedUnitTrasform(key)) {
+            let value = transformUnitValue(style[key]);
+            style[key] = value;
+        }
+    });
+    return style;
+}
+function transformUnitValue(value) {
+    if (isHmUnit.test(value)) {
+        return transfromHm(value);
+    }
+    else if (isPecentUnit.test(value)) {
+        return value;
+    }
+    else if (isStaticNumber.test(value)) {
+        return value + 'rem';
+    }
+    return value;
+}
+function transfromHm(value) {
+    return value.replace('hm', 'rem');
+}
+
+class StyleTransformer {
+    constructor() {
+        this.middlewares = [];
+        this.registerMiddleware();
+    }
+    registerMiddleware() {
+        this
+            .use(transformUnit);
+    }
+    use(middleware) {
+        if (typeof middleware !== 'function') {
+            throw "middleware must be a function";
+        }
+        this.middlewares.push(middleware);
+        return this;
+    }
+    transformStyle(style = {}, view) {
+        let tempStyle = style;
+        this.middlewares.forEach(middleware => {
+            let result = middleware(tempStyle, view);
+            tempStyle = result ? result : tempStyle;
+        });
+        return tempStyle;
+    }
+}
+const styleTransformer = new StyleTransformer();
 
 const SIZE_STYLE = [
     'top',
@@ -3064,28 +3140,7 @@ class View {
                 return target[key] || this.node.style[key];
             },
             set: (target, key, value) => {
-                switch (key) {
-                    case 'backgroundColor':
-                        const reg = /gradient/;
-                        target[key] = value;
-                        reg.test(value)
-                            ? (this.node.style['background'] = '-webkit-' + value)
-                            : (this.node.style[key] = value);
-                        break;
-                    case 'shadow':
-                        target[key] = value;
-                        this.node.style['boxShadow'] = value;
-                        break;
-                    default:
-                        if (SIZE_STYLE.includes(key)) {
-                            target[key] = formatUnit(value);
-                            this.node.style[key] = formatUnit(value);
-                        }
-                        else {
-                            target[key] = value;
-                            this.node.style[key] = value;
-                        }
-                }
+                this.node.style[key] = value;
                 return true;
             }
         });
@@ -3093,10 +3148,10 @@ class View {
         this.initialize();
     }
     defaultStyle() {
-        this.node.classList.add('hm-default');
+        this.node.classList.add('hm-default-view');
     }
     createNode() {
-        this.node = document.createElement('div');
+        this.node = document.createElement('view');
     }
     get enabled() {
         return this._enabled;
@@ -3114,7 +3169,8 @@ class View {
         return this._style;
     }
     set style(_style) {
-        this._style = Object.assign(this._style, _style);
+        let standardStyle = styleTransformer.transformStyle(_style);
+        this._style = Object.assign(this._style, standardStyle);
     }
     initialize() { }
     finalize() { }
@@ -3575,30 +3631,11 @@ class Button extends View {
     constructor() {
         super();
         this._enabled = true;
-        this._style = new Proxy(this._style, {
-            get: (target, key) => {
-                return target[key] || this.node.style[key];
-            },
-            set: (target, key, value) => {
-                target[key] = value;
-                switch (key) {
-                    case 'fontSize':
-                        target[key] = formatUnit(value);
-                        this.node.style[key] = formatUnit(value);
-                    case 'textAlign':
-                        target[key] = value;
-                        this.node.style[key] = value;
-                    default:
-                        this.node.style[key] = value;
-                }
-                return true;
-            }
-        });
         this.defaultStyle();
         this.init();
     }
     defaultStyle() {
-        this.node.classList.add('hm-default-inline');
+        this.node.classList.add('hm-default-button');
     }
     init() {
         const hammer = new Hammer(this.node);
@@ -3610,6 +3647,7 @@ class Button extends View {
                     pre[curr] = this.style[curr];
                     return pre;
                 }, {});
+                console.warn('record _beforePressedStyle', this._beforePressedStyle);
                 this.style = this.pressed;
             }
         };
@@ -3618,25 +3656,20 @@ class Button extends View {
                 return;
             if (this._beforePressedStyle) {
                 this.style = this._beforePressedStyle;
+                console.warn('reset _beforePressedStyle', this._beforePressedStyle);
             }
         };
         hammer.on('press', pressEvent);
         hammer.on('pressup', pressUpEvent);
     }
     createNode() {
-        this.node = document.createElement('button');
+        this.node = document.createElement('view');
     }
     get text() {
         return this.node.innerText;
     }
     set text(text) {
         this.node.innerText = text;
-    }
-    get style() {
-        return this._style;
-    }
-    set style(_style) {
-        this._style = Object.assign(this._style, _style);
     }
     get enabled() {
         return this._enabled;
@@ -3672,25 +3705,9 @@ class Button extends View {
 class Carousel extends View {
     constructor() {
         super();
-        this._style = this._style = new Proxy(this._style, {
-            get: (target, key) => {
-                return target[key] || this.node.style[key];
-            },
-            set: (target, key, value) => {
-                target[key] = value;
-                this.node.style[key] = value;
-                return true;
-            }
-        });
     }
     createNode() {
         this.node = document.createElement('div');
-    }
-    get style() {
-        return this._style;
-    }
-    set style(_style) {
-        this._style = Object.assign(this._style, _style);
     }
     onPageChange(callback) {
         callback();
@@ -3706,25 +3723,9 @@ class Carousel extends View {
 class HorizontalScroller extends View {
     constructor() {
         super();
-        this._style = this._style = new Proxy(this._style, {
-            get: (target, key) => {
-                return target[key] || this.node.style[key];
-            },
-            set: (target, key, value) => {
-                target[key] = value;
-                this.node.style[key] = value;
-                return true;
-            }
-        });
     }
     createNode() {
         this.node = document.createElement('span');
-    }
-    get style() {
-        return this._style;
-    }
-    set style(_style) {
-        this._style = Object.assign(this._style, _style);
     }
     scrollTo(x, y) { }
     scrollBy(dx, dy) { }
@@ -3992,7 +3993,7 @@ class Scroller extends View {
         });
     }
     createNode() {
-        this.node = document.createElement('div');
+        this.node = document.createElement('view');
     }
     get style() {
         return this._style;
@@ -4144,26 +4145,12 @@ class Text extends View {
     constructor() {
         super();
         this.node.classList.add('hm-text');
-        this._style = new Proxy(this._style, {
-            get: (target, key) => {
-                return target[key] || this.node.style[key];
-            },
-            set: (target, key, value) => {
-                target[key] = value;
-                switch (key) {
-                    case 'textLineClamp':
-                        target[key] = value;
-                        break;
-                    case 'fontSize':
-                        target[key] = formatUnit(value);
-                        this.node.style[key] = formatUnit(value);
-                }
-                return true;
-            }
-        });
+    }
+    defaultStyle() {
+        this.node.classList.add('hm-default-text');
     }
     createNode() {
-        this.node = document.createElement('div');
+        this.node = document.createElement('text');
     }
     get text() {
         return this.node.innerText;
@@ -4182,12 +4169,6 @@ class Text extends View {
     }
     set formattedText(value) {
         this.node.innerHTML = value;
-    }
-    get style() {
-        return this._style;
-    }
-    set style(_style) {
-        this._style = Object.assign(this._style, _style);
     }
 }
 
@@ -4283,3 +4264,4 @@ class ViewPager extends View {
 }
 
 export { BasicAnimation, Button, Carousel, Dialog, Environment, Event, HorizontalScroller, Hummer, HummerGlobal, INPUT_SIZE_STYLE, Image, ImagePicker, Input, InputEvent, InputState, KeyframeAnimation, List, Location, LongPressEvent, LongPressState, Memory, Navigator, NotifyCenter, PanEvent, PanState, Phone, PinchEvent, PinchState, Request, Response, SIZE_STYLE, ScrollEvent, ScrollState, Scroller, Storage, SwipeEvent, SwipeState, Switch, SwitchEvent, TapEvent, TapState, Text, TextArea, Timer, Toast, TouchEvent, TouchState, View, ViewPager, WebSocket };
+//# sourceMappingURL=index.js.map

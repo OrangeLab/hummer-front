@@ -17,8 +17,6 @@ export declare class Button extends View {
     protected createNode(): void;
     get text(): string;
     set text(text: string);
-    get style(): ButtonStyle;
-    set style(_style: ButtonStyle);
     get enabled(): boolean;
     set enabled(_enabled: boolean);
     get disabled(): ButtonStyle;

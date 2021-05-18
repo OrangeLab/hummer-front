@@ -9,34 +9,12 @@ export class HorizontalScroller extends View {
 
   constructor() {
     super()
-    // @ts-ignore
-    this._style = this._style = new Proxy(this._style, {
-      get: (target, key) => {
-        // @ts-ignore
-        return target[key] || this.node.style[key]
-      },
-      set: (target, key, value) => {
-        // 设置style
-        // @ts-ignore
-        target[key] = value
-        this.node.style[key] = value
-        return true
-      }
-    })
   }
 
   protected createNode() {
     this.node = document.createElement('span')
   }
 
-  get style() {
-    return this._style
-  }
-
-  set style(_style: HorizontalScrollerStyle) {
-    this._style = Object.assign(this._style, _style)
-  }
-  
 
   /**
    * 滚动到坐标
