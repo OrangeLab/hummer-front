@@ -17,7 +17,7 @@
 		"example": "node ./script/playground.js",
 		"comment": "npm run git -- 'commit-msg'  so you can push and update by a auto way",
 		"git": "npm run build && git add . && git commit -m",
-		"release": "node ./script/publish.js"
+		"release": "node ./script/release.js"
 	},
 	"repository": {
 		"type": "git",
@@ -37,6 +37,7 @@
 		"@rollup/plugin-node-resolve": "^13.0.0",
 		"@rollup/plugin-strip": "^2.0.0",
 		"@types/hammerjs": "^2.0.39",
+		"enquirer": "^2.3.6",
 		"execa": "^4.0.3",
 		"fs-extra": "^9.0.1",
 		"inquirer": "^7.3.3",
