@@ -7,3 +7,4 @@ TODOs.md
 *.log
 
 package-lock.json
+dist

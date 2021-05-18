@@ -27,7 +27,7 @@ export class Scroller extends View {
   }
 
   protected createNode() {
-    this.node = document.createElement('div')
+    this.node = document.createElement('view')
   }
 
   get style() {

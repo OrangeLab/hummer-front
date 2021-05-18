@@ -1,6 +1,5 @@
-import * as Hammer from 'hammerjs'
+import Hammer from 'hammerjs'
 import { View, ViewStyle } from './View'
-import { formatUnit } from '../../common/utils'
 export interface ButtonStyle extends ViewStyle {
   textAlign?: 'left' | 'center' | 'right'
   fontFamily?: string
@@ -21,35 +20,11 @@ export class Button extends View {
   constructor() {
     super()
     this._enabled = true
-    // @ts-ignore
-    this._style = new Proxy(this._style, {
-      get: (target, key) => {
-        // 获取style
-        // @ts-ignore
-        return target[key] || this.node.style[key]
-      },
-      set: (target, key, value) => {
-        // 设置style
-        // @ts-ignore
-        target[key] = value
-        switch (key) {
-          case 'fontSize':
-            target[key] = formatUnit(value)
-            this.node.style[key] = formatUnit(value)
-          case 'textAlign':
-            target[key] = value
-            this.node.style[key] = value
-          default:
-            this.node.style[key] = value
-        }
-        return true
-      }
-    })
     this.defaultStyle()
     this.init()
   }
   protected defaultStyle() {
-    this.node.classList.add('hm-default-inline')
+    this.node.classList.add('hm-default-button')
   }
 
   private init() {
@@ -86,7 +61,7 @@ export class Button extends View {
   }
 
   protected createNode() {
-    this.node = document.createElement('button')
+    this.node = document.createElement('view')
   }
 
   get text() {
@@ -95,14 +70,6 @@ export class Button extends View {
 
   set text(text: string) {
     this.node.innerText = text
-  }
-
-  get style() {
-    return this._style
-  }
-
-  set style(_style: ButtonStyle) {
-    this._style = Object.assign(this._style, _style)
   }
 
   get enabled() {

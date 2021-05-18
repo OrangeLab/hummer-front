@@ -1,5 +1,6 @@
 import { View, ViewStyle } from './View'
 
+// TODO Image Component 对接
 export interface ImageStyle extends ViewStyle {
   // 图片拉伸模式
   resize?: 'origin' | 'contain' | 'cover' | 'stretch'

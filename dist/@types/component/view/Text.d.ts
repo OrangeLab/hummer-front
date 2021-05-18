@@ -15,6 +15,7 @@ export interface TextStyle extends ViewStyle {
 export declare class Text extends View {
     protected _style: TextStyle;
     constructor();
+    protected defaultStyle(): void;
     protected createNode(): void;
     get text(): string;
     set text(value: string);
@@ -22,6 +23,4 @@ export declare class Text extends View {
     set richText(value: any);
     get formattedText(): string;
     set formattedText(value: string);
-    get style(): TextStyle;
-    set style(_style: TextStyle);
 }
