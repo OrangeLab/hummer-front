@@ -8,6 +8,7 @@ export declare class Image extends View {
     protected _gifSrc: string;
     constructor();
     protected createNode(): void;
+    protected defaultStyle(): void;
     private setImageResizeMode;
     get src(): string;
     set src(src: string);

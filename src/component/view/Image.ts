@@ -46,7 +46,13 @@ export class Image extends View {
     this.node = document.createElement('div')
   }
 
-  private setImageResizeMode(value: ImageStyle) {
+  // Todo: 仅为测试
+  protected defaultStyle() {
+    this.node.classList.add('hm-image')
+  }
+
+  private setImageResizeMode(value: string) {
+    console.log('setImageResizeMode', value)
     switch (value) {
       case 'origin':
         this.node.style.backgroundSize = 'initial'
