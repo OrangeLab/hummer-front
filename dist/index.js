@@ -3081,8 +3081,7 @@ class StyleTransformer {
         this.registerMiddleware();
     }
     registerMiddleware() {
-        this
-            .use(transformUnit);
+        this.use(transformUnit);
     }
     use(middleware) {
         if (typeof middleware !== 'function') {
@@ -3764,11 +3763,7 @@ class Image extends View {
     createNode() {
         this.node = document.createElement('div');
     }
-    defaultStyle() {
-        this.node.classList.add('hm-image');
-    }
     setImageResizeMode(value) {
-        console.log('setImageResizeMode', value);
         switch (value) {
             case 'origin':
                 this.node.style.backgroundSize = 'initial';
@@ -3790,6 +3785,10 @@ class Image extends View {
                 this.node.style.backgroundRepeat = 'no-repeat';
                 this.node.style.backgroundPosition = '0 0';
                 break;
+            default:
+                this.node.style.backgroundSize = 'initial';
+                this.node.style.backgroundRepeat = 'no-repeat';
+                this.node.style.backgroundPosition = 'center center';
         }
     }
     get src() {
@@ -3815,12 +3814,6 @@ class Image extends View {
     }
     get onload() {
         return this.node.onload;
-    }
-    get style() {
-        return this._style;
-    }
-    set style(_style) {
-        this._style = Object.assign(this._style, _style);
     }
 }
 
@@ -4166,13 +4159,17 @@ class Text extends View {
         return this.node.innerText;
     }
     set richText(value) {
-        this.node.innerText = value;
+        this.parseRichText(value);
     }
     get formattedText() {
         return this.node.innerHTML;
     }
     set formattedText(value) {
         this.node.innerHTML = value;
+    }
+    parseRichText(value) {
+        console.log('parseRichText', value);
+        this.node.innerText = value;
     }
 }
 

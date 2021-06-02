@@ -23,4 +23,5 @@ export declare class Text extends View {
     set richText(value: any);
     get formattedText(): string;
     set formattedText(value: string);
+    private parseRichText;
 }

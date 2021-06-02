@@ -8,7 +8,6 @@ export declare class Image extends View {
     protected _gifSrc: string;
     constructor();
     protected createNode(): void;
-    protected defaultStyle(): void;
     private setImageResizeMode;
     get src(): string;
     set src(src: string);
@@ -18,6 +17,4 @@ export declare class Image extends View {
     set gifRepeatCount(gifRepeatCount: number);
     set onload(onload: Function);
     get onload(): Function;
-    get style(): ImageStyle;
-    set style(_style: ImageStyle);
 }

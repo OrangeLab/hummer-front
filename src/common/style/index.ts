@@ -10,16 +10,15 @@ import {transformUnit} from './transformer/unit'
 class StyleTransformer{
 
   private middlewares: Array<Function> = []
-  constructor(){
+  constructor() {
     this.registerMiddleware()
   }
 
-  registerMiddleware(){
-    this
-    .use(transformUnit)
+  registerMiddleware() {
+    this.use(transformUnit)
   }
 
-  use(middleware: Function){
+  use(middleware: Function) {
     if(typeof middleware !== 'function'){
       throw "middleware must be a function"
     }

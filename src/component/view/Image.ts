@@ -46,13 +46,7 @@ export class Image extends View {
     this.node = document.createElement('div')
   }
 
-  // Todo: 仅为测试
-  protected defaultStyle() {
-    this.node.classList.add('hm-image')
-  }
-
   private setImageResizeMode(value: string) {
-    console.log('setImageResizeMode', value)
     switch (value) {
       case 'origin':
         this.node.style.backgroundSize = 'initial'
@@ -74,6 +68,10 @@ export class Image extends View {
         this.node.style.backgroundRepeat = 'no-repeat'
         this.node.style.backgroundPosition = '0 0'
         break
+      default:
+        this.node.style.backgroundSize = 'initial'
+        this.node.style.backgroundRepeat = 'no-repeat'
+        this.node.style.backgroundPosition = 'center center'
     }
   }
 
@@ -108,12 +106,5 @@ export class Image extends View {
   get onload() {
     return this.node.onload
   }
-
-  get style() {
-    return this._style
-  }
-
-  set style(_style: ImageStyle) {
-    this._style = Object.assign(this._style, _style)
-  }
+  
 }
