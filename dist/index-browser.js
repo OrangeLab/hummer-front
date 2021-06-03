@@ -3632,7 +3632,6 @@ var __GLOBAL__ = (function (exports) {
   class Button extends View {
       constructor() {
           super();
-          this._enabled = true;
           this.defaultStyle();
           this.init();
       }
@@ -3649,7 +3648,6 @@ var __GLOBAL__ = (function (exports) {
                       pre[curr] = this.style[curr];
                       return pre;
                   }, {});
-                  console.warn('record _beforePressedStyle', this._beforePressedStyle);
                   this.style = this.pressed;
               }
           };
@@ -3665,7 +3663,7 @@ var __GLOBAL__ = (function (exports) {
           hammer.on('pressup', pressUpEvent);
       }
       createNode() {
-          this.node = document.createElement('view');
+          this.node = document.createElement('button');
       }
       get text() {
           return this.node.innerText;
@@ -3698,9 +3696,15 @@ var __GLOBAL__ = (function (exports) {
       get disabled() {
           return this._disabled;
       }
-      set disabled(_disabled) {
-          this._disabled = _disabled;
+      set disabled(value) {
+          this._disabled = value;
           this.enabled = this._enabled;
+      }
+      get pressed() {
+          return this._pressedStyle;
+      }
+      set pressed(value) {
+          this._pressedStyle = value;
       }
   }
 
@@ -4171,7 +4175,6 @@ var __GLOBAL__ = (function (exports) {
           this.node.innerHTML = value;
       }
       parseRichText(value) {
-          console.log('parseRichText', value);
           this.node.innerText = value;
       }
   }

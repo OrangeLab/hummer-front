@@ -9,8 +9,7 @@ export declare class Button extends View {
     private _beforeDisabledStyle;
     private _disabled;
     private _beforePressedStyle;
-    pressed: ButtonStyle;
-    protected _style: ButtonStyle;
+    private _pressedStyle;
     constructor();
     protected defaultStyle(): void;
     private init;
@@ -20,5 +19,7 @@ export declare class Button extends View {
     get enabled(): boolean;
     set enabled(_enabled: boolean);
     get disabled(): ButtonStyle;
-    set disabled(_disabled: ButtonStyle);
+    set disabled(value: ButtonStyle);
+    get pressed(): ButtonStyle;
+    set pressed(value: ButtonStyle);
 }

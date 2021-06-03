@@ -34,6 +34,7 @@ export class Scroller extends View {
     return this._style
   }
 
+  // Todo: 样式转换
   set style(_style: ScrollerStyle) {
     this._style = Object.assign(this._style, _style)
   }

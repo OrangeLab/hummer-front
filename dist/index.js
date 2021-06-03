@@ -3197,6 +3197,7 @@ class View {
         return null;
     }
     addEventListener(key, listener) {
+        debugger;
         if (!this.listeners[key]) {
             this.listeners[key] = [];
         }
@@ -3629,7 +3630,6 @@ class View {
 class Button extends View {
     constructor() {
         super();
-        this._enabled = true;
         this.defaultStyle();
         this.init();
     }
@@ -3646,7 +3646,6 @@ class Button extends View {
                     pre[curr] = this.style[curr];
                     return pre;
                 }, {});
-                console.warn('record _beforePressedStyle', this._beforePressedStyle);
                 this.style = this.pressed;
             }
         };
@@ -3662,7 +3661,7 @@ class Button extends View {
         hammer.on('pressup', pressUpEvent);
     }
     createNode() {
-        this.node = document.createElement('view');
+        this.node = document.createElement('button');
     }
     get text() {
         return this.node.innerText;
@@ -3695,9 +3694,15 @@ class Button extends View {
     get disabled() {
         return this._disabled;
     }
-    set disabled(_disabled) {
-        this._disabled = _disabled;
+    set disabled(value) {
+        this._disabled = value;
         this.enabled = this._enabled;
+    }
+    get pressed() {
+        return this._pressedStyle;
+    }
+    set pressed(value) {
+        this._pressedStyle = value;
     }
 }
 
@@ -4168,7 +4173,6 @@ class Text extends View {
         this.node.innerHTML = value;
     }
     parseRichText(value) {
-        console.log('parseRichText', value);
         this.node.innerText = value;
     }
 }
