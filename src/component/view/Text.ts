@@ -43,7 +43,8 @@ export class Text extends View {
   }
 
   set richText(value: any) {
-    this.node.innerText = value
+    // Todo: 解析富文本
+    this.parseRichText(value)
   }
 
   get formattedText() {
@@ -52,5 +53,9 @@ export class Text extends View {
 
   set formattedText(value: string) {
     this.node.innerHTML = value
+  }
+
+  private parseRichText(value: any) {
+    this.node.innerText = value
   }
 }

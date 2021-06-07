@@ -13,13 +13,10 @@ export class Button extends View {
   private _disabled!: ButtonStyle
   private _beforePressedStyle!: ButtonStyle
   // 按下态的样式
-  pressed!: ButtonStyle
-
-  protected _style: ButtonStyle
+  private _pressedStyle!: ButtonStyle
 
   constructor() {
     super()
-    this._enabled = true
     this.defaultStyle()
     this.init()
   }
@@ -31,7 +28,6 @@ export class Button extends View {
     const hammer = new Hammer(this.node)
     const pressEvent = () => {
       if (!this.enabled) return
-
       if (this.pressed) {
         // 记录press之前的样式
         this._beforePressedStyle = Object.keys(this.pressed).reduce(
@@ -42,26 +38,26 @@ export class Button extends View {
           },
           {}
         )
-        console.warn('record _beforePressedStyle', this._beforePressedStyle)
+        // console.warn('record _beforePressedStyle', this._beforePressedStyle)
         // 设置pressed样式
         this.style = this.pressed
       }
     }
     const pressUpEvent = () => {
       if (!this.enabled) return
-
       if (this._beforePressedStyle) {
         // 恢复pressed之前的样式
         this.style = this._beforePressedStyle
         console.warn('reset _beforePressedStyle', this._beforePressedStyle)
       }
+      // Todo: 事件中断处理？可以通过代理全局对象进行代理来做样式兜底
     }
     hammer.on('press', pressEvent)
     hammer.on('pressup', pressUpEvent)
   }
 
   protected createNode() {
-    this.node = document.createElement('view')
+    this.node = document.createElement('button')
   }
 
   get text() {
@@ -79,6 +75,7 @@ export class Button extends View {
   set enabled(_enabled: boolean) {
     this._enabled = _enabled
     if (!_enabled) {
+      // Todo: 原生标签的属性 disabled 的值是 ‘disabled’
       this.node.disabled = true
       // 设置disabled样式
       if (this.disabled) {
@@ -109,10 +106,19 @@ export class Button extends View {
     return this._disabled
   }
 
-  set disabled(_disabled) {
+  set disabled(value: ButtonStyle) {
+    // console.log('_disabled style', value)
     // 设置样式
-    this._disabled = _disabled
-    // 触发enabled的修改，更新样式
+    this._disabled = value
+    // 触发enabled的修改，更新样式s
     this.enabled = this._enabled
+  }
+
+  get pressed() {
+    return this._pressedStyle
+  }
+
+  set pressed(value: ButtonStyle) {
+    this._pressedStyle = value
   }
 }
