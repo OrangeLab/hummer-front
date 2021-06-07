@@ -556,6 +556,7 @@ export class View {
           const { scroll } = this.eventListeners[key]
           this.node.removeEventListener('scroll', scroll)
         }
+        this.eventListeners[key] = void 0
       }
     }
   }
