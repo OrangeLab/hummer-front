@@ -20,6 +20,7 @@ export class Scroller extends View {
   bounces: boolean = true // 滑动到 边缘时是否有回弹效果
   protected _style: ScrollerStyle
 
+  // @ts-ignore
   private rowCount!: number
   // private _listRows: View[] = []s
   // private _gridRows: View[] = []
@@ -32,9 +33,9 @@ export class Scroller extends View {
   
   constructor() {
     super()
-    this.wrapper = new View()
-    this.wrapper.node.classList.add('hm-list-content')
-    this.appendChild(this.wrapper)
+    // this.wrapper = new View()
+    // this.wrapper.node.classList.add('hm-list-content')
+    // this.appendChild(this.wrapper)
 
     // Todo: add style to this node
 
@@ -52,7 +53,7 @@ export class Scroller extends View {
         return true
       }
     })
-    this.refresh(this.rowCount)
+    // this.refresh(this.rowCount)
   }
 
   refresh(count: number) {
