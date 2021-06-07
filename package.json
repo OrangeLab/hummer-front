@@ -1,6 +1,6 @@
 {
   "name": "@hummer/hummer-front",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "@hummer/hummer-front",
   "main": "dist/dokit.js",
   "unpkg": "dist/index-browser.js",
