@@ -37,6 +37,7 @@
     "@rollup/plugin-node-resolve": "^13.0.0",
     "@rollup/plugin-strip": "^2.0.0",
     "@types/hammerjs": "^2.0.39",
+    "art-template": "^4.13.2",
     "enquirer": "^2.3.6",
     "execa": "^4.0.3",
     "fs-extra": "^9.0.1",
