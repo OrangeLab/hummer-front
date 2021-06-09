@@ -7,25 +7,16 @@
 //         {
 //             "type": "node",
 //             "request": "launch",
-//             "name": "启动程序",
+//             "name": "脚本测试",
 //             "skipFiles": [
 //                 "<node_internals>/**"
 //             ],
-//             "program": "${workspaceFolder}/dist/dokit.js",
+//             "program": "${workspaceFolder}/script/playground.js",
+//             "args": ["--url", "http://www.baidu.com"],
 //             "outFiles": [
 //                 "${workspaceFolder}/**/*.js"
 //             ]
 //         }
 //     ]
-// }
-// {
-//     "name": "Launch via NPM",
-//     "type": "node",
-//     "request": "launch",
-//     "runtimeExecutable": "npm",
-//     "runtimeArgs": [
-//       "run-script", "example"    //这里的dev就对应package.json中的scripts中的dev
-//     ],
-//     "port": 9229    //这个端口是调试的端口，不是项目启动的端口
 // }
 

@@ -7,15 +7,20 @@ const template = require('art-template')
 const serveHandler = require('serve-handler')
 const server = http.createServer()
 const rootPath = path.join(__dirname, '../')
+const argv = require('yargs').argv
+let injectJsUrls = []
+
+if (argv._ && argv._.length) {
+  injectJsUrls = argv._.slice()
+  console.log('injectJsUrls', injectJsUrls)
+}
 
 function run() {
-
   server.on('request', async function(req, res) {
     await serveHandler(req, res, {
       "public": path.join(rootPath, 'dist')
     }, {
       sendError(absolutePath, response, acceptsJSON, root, handlers, config, error) {
-
         const urlObj = url.parse(req.url, true)
         const pathName = urlObj.pathname
         if (pathName === '/playground') {
@@ -25,9 +30,9 @@ function run() {
           fs.readFile(filePath, function(err, data) {
             if (err) { }
             let htmlstr = template.render(data.toString(), {
-              // Todo: 获取命令行参数
               cssPath,
-              jsPath
+              jsPath,
+              injectJsUrls
             })
             res.end(htmlstr)
           })
@@ -40,7 +45,7 @@ function run() {
     console.log('Dev Server Running at http://localhost:5001');
     open('http://localhost:5001/playground');
   })
-  
+
 }
 
 run()
