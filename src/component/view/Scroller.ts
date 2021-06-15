@@ -37,8 +37,6 @@ export class Scroller extends View {
     // this.wrapper.node.classList.add('hm-list-content')
     // this.appendChild(this.wrapper)
 
-    // Todo: add style to this node
-
     // @ts-ignore
     this._style = new Proxy(this._style, {
       get: (target, key) => {
@@ -53,7 +51,12 @@ export class Scroller extends View {
         return true
       }
     })
+
     // this.refresh(this.rowCount)
+  }
+
+  protected defaultStyle() {
+    this.node.classList.add('hm-default-vertical')
   }
 
   refresh(count: number) {
