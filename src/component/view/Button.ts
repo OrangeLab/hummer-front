@@ -53,7 +53,6 @@ export class Button extends View {
       // Todo: 事件中断处理？可以通过代理全局对象进行代理来做样式兜底
     }
     hammer.on('press', pressEvent)
-    debugger
     hammer.on('pressup', pressUpEvent)
   }
 
