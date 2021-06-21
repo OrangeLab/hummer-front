@@ -58,13 +58,10 @@ Socket 链接
 
 # 本地调试
 
-`Hummer-font` 作为浏览器端模拟的 `Hummer` 环境，为了方面和原生基础组件拉齐，在开发 `Hummer-font` 时，支持 `$ npm run example hummer-resource-ip`。
+`Hummer-font` 作为浏览器端模拟的 `Hummer` 环境，为了方面和原生基础组件拉齐，在开发 `Hummer-font` 时，支持 `$ npm run example hummer-resource-ip` & `$ npm run dev:example hummer-resource-ip`。
 
 > eg: npm run example http://172.23.165.113:8000/component-button.js
 
+> eg: npm run dev:example http://172.23.165.113:8000/component-button.js
+
 支持多个 url，具体逻辑可以查阅 `./script/playground.js`
-
-TodoList:
-
-1.  完善浏览器端调试可以进入到 `Hummer-front` 的 **ts源码**。
-
