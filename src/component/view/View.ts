@@ -112,6 +112,7 @@ export interface ViewStyle {
   transitionProperty?: string,
   transitionDuration?: string | number,
   transitionTimingFunction?: 'linear' | 'ease-in' | 'ease-out' | 'ease-in-out'
+  
 }
 
 export type EventType =
@@ -148,6 +149,8 @@ export class View {
     [key: string]: { hammer?: any; listener?: Function; [key: string]: any }
   }
   protected animations: { [key: string]: Animation }
+  isHighlight?: Boolean
+
   layout!: () => void
 
   constructor(public viewID?: string) {
@@ -628,7 +631,13 @@ export class View {
     }
   }
 
-  getRect(callback: Function) {}
+  getRect(callback: Function) {
+    callback({})
+  }
+
+  dbg_highlight(isHighlight: Boolean) {
+    !!isHighlight ? this.node.classList.add('hm-high-light'):this.node.classList.remove('hm-high-light')
+  }
 
   resetStyle() {}
 

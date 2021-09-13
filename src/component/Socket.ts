@@ -1,13 +1,2 @@
-export const WebSocket = {
-  connect(url: string) {},
-  close(code: any, reason: any) {},
-  send(data: any) {},
-  onopen(callback: Function) {},
-  onOpen(callback: Function) {},
-  onclose(callback: Function) {},
-  onClose(callback: Function) {},
-  onerror(callback: Function) {},
-  onError(callback: Function) {},
-  onmessage(callback: Function) {},
-  onMessage(callback: Function) {}
-}
+// Hummer侧的WebSocket协议已经和web端统一  https://github.com/didi/Hummer/issues/280
+export const WebSocket = window.WebSocket
