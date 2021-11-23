@@ -1,59 +1,95 @@
 // @ts-nocheck
 .hm-list {
   overflow: hidden;
+
   .hm-list-row {
     box-sizing: border-box;
+
     .hm-list-column {
       box-sizing: border-box;
       // flex: 1;
       // width: 0;
       overflow: hidden;
     }
+
     .hm-list-column-waterfall {
       justify-content: flex-start;
+      flex-direction: column;
+      flex: 1;
+
+      .cell {
+        max-width: 100%;
+      }
+    }
+    .hm-list-column-grid{
+      justify-content: flex-start;
+      flex-direction: column;
+
       .cell {
         max-width: 100%;
       }
     }
   }
+
   .hm-list-content {
     position: relative;
-    flex: 1;
+    // flex: 1;
     width: 100%;
-    justify-content: flex-start;
+    // justify-content: flex-start;
   }
+
   .hm-list-refresh-view {
     flex-shrink: 0;
   }
+
   .hm-list-loadMore-view {
     flex-shrink: 0;
   }
+
   // mode:list 垂直
   &.vertical {
-    justify-content: flex-start;
+    // justify-content: flex-start;
+    flex-direction: column;
+
     .hm-list-row {
       display: flex;
       flex-direction: row;
-      align-items: flex-start;
-      justify-content: flex-start;
+      // align-items: flex-start;
+      // justify-content: flex-start;
       width: 100%;
     }
-    .hm-list-column {
-    }
+
+    .hm-list-column {}
   }
-  
+
   // mode:list 水平
   &.horizontal {
     flex-direction: row;
-    justify-content: flex-start;
+
+    // justify-content: flex-start;
     .hm-list-content {
       flex-direction: row;
       width: auto;
       height: 100%;
       white-space: nowrap;
+
       .hm-list-row {
         height: 100%;
       }
+    }
+  }
+
+  .horizontal {
+    flex-direction: row;
+  }
+
+  .hm-list-content-horizontal {
+    width: auto;
+    height: 100%;
+    white-space: nowrap;
+
+    .hm-list-row {
+      height: 100%;
     }
   }
 }

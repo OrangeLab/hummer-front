@@ -29,8 +29,10 @@
   },
   "license": "ISC",
   "dependencies": {
-    "better-scroll": "^1.15.2",
-    "hammerjs": "^2.0.8"
+    "@better-scroll/core": "^2.4.2",
+    "better-scroll": "^2.4.2",
+    "hammerjs": "^2.0.8",
+    "swiper": "7.0.8"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^19.0.0",
@@ -38,6 +40,7 @@
     "@rollup/plugin-strip": "^2.0.0",
     "@types/hammerjs": "^2.0.39",
     "@types/node": "^15.12.2",
+    "@types/resize-observer-browser": "^0.1.6",
     "art-template": "^4.13.2",
     "enquirer": "^2.3.6",
     "execa": "^4.0.3",

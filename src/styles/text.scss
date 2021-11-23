@@ -1,9 +1,9 @@
 // @ts-nocheck
-.hm-default.hm-text {
-  display: inline-block;
-  white-space: nowrap;
+.hm-default-text {
+  display: flex;
   overflow: hidden;
   max-width: 100%;
+  align-items: center;
   //overflow: hidden;
   //text-overflow: ellipsis;
   //display: -webkit-box;

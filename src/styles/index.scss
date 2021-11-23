@@ -3,6 +3,7 @@
 @import "text";
 @import "image";
 @import "./scroll";
+@import "./swiper";
 body {
   margin: 0;
   padding: 0;
@@ -15,6 +16,8 @@ div, button, input, textarea, span,p, image, view, text{
   font-size: 16px;
   border: none;
   border-width: 0;
+  display: flex;
+  flex-shrink: 0;
 }
 button {
   overflow: hidden;

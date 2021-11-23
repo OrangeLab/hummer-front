@@ -25,10 +25,12 @@ function run() {
         const pathName = urlObj.pathname
         if (pathName === '/playground') {
           const filePath = path.join(rootPath, 'pages/index.html')
-          const cssPath = 'http://localhost:5001/index-browser.css'
-          const jsPath = 'http://localhost:5001/index-browser.js'
+          const cssPath = 'http://172.23.166.84:5002/index-browser.css'
+          const jsPath = 'http://172.23.166.84:5002/index-browser.js'
           fs.readFile(filePath, function(err, data) {
-            if (err) { }
+            if (err) {
+              console.log(err);
+            }
             let htmlstr = template.render(data.toString(), {
               cssPath,
               jsPath,
@@ -41,9 +43,9 @@ function run() {
     })
   })
 
-  server.listen(5001, () => {
-    console.log('Dev Server Running at http://localhost:5001');
-    open('http://localhost:5001/playground');
+  server.listen(5002, () => {
+    console.log('Dev Server Running at http://localhost:5002');
+    open('http://localhost:5002/playground');
   })
 
 }

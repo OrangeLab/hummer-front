@@ -215,12 +215,30 @@ export class View {
    */
   finalize() {}
 
+  // Mounted 生命周期
+  // @ts-ignore
+  private _onMounted() {
+    this.onMounted();
+  }
+
+  protected onMounted() {
+
+  }
+  // @ts-ignore
+  private _onDestoryed() {
+    this.onDestoryed();
+  }
+
+  protected onDestoryed() { }
+
   appendChild(subview: any) {
     this.node.appendChild(subview.node)
+    subview._onMounted();
     // this.subViews.add(subview)
   }
 
   removeChild(subview: any) {
+    subview._onDestoryed();
     this.node.removeChild(subview.node)
     // this.subViews.delete(subview)
   }
@@ -232,6 +250,7 @@ export class View {
 
   insertBefore(subview: any, existingView: View) {
     this.node.insertBefore(subview.node, existingView.node)
+    subview._onMounted();
     // this.subViews.add(subview)
   }
 
