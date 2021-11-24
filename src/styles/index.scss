@@ -4,21 +4,32 @@
 @import "image";
 @import "./scroll";
 @import "./swiper";
+
 body {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+
+  div,
+  button,
+  input,
+  textarea,
+  span,
+  p,
+  image,
+  view,
+  text {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-size: 16px;
+    border: none;
+    border-width: 0;
+    display: flex;
+    flex-shrink: 0;
+  }
 }
-div, button, input, textarea, span,p, image, view, text{
-  padding: 0;
-  margin: 0;
-  box-sizing: border-box;
-  font-size: 16px;
-  border: none;
-  border-width: 0;
-  display: flex;
-  flex-shrink: 0;
-}
+
 button {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -26,29 +37,33 @@ button {
   outline: none;
   background-color: #ffffff;
 }
+
 .hm-default {
   display: flex;
   position: relative;
   flex-direction: column;
   border-style: solid;
 }
+
 .hm-default-inline {
   display: inline;
   position: relative;
   text-align: center;
 }
 
-.hm-default-view{
+.hm-default-view {
   display: flex;
   flex-direction: column;
   position: relative;
   border-style: solid;
 }
-.hm-default-button{
+
+.hm-default-button {
   display: flex;
   justify-content: center;
   align-items: center;
 }
+
 .hm-high-light {
   border: 1px solid red;
 }
