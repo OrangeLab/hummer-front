@@ -23,9 +23,7 @@ export class Input extends View {
 
   constructor() {
     super()
-    this._style = new Proxy(
-      {},
-      {
+    this._style = new Proxy(this._style,{
         get: (target, key) => {
           switch (key) {
             case 'type':
@@ -61,7 +59,7 @@ export class Input extends View {
           }
           switch (key) {
             case 'type':
-              this.node.type = value
+              this.node.type!=='textarea'&&(this.node.type = value)
               break
             case 'placeholderColor':
               this.changePlaceholder({
@@ -96,7 +94,6 @@ export class Input extends View {
         }
       }
     )
-    this.defaultStyle()
   }
   protected defaultStyle() {
     this.node.classList.add('hm-default-inline')
@@ -112,10 +109,10 @@ export class Input extends View {
     this.node.classList.add(this._randomPlaceholderClass)
     if (document.styleSheets.item(0)) {
       const item: any = document.styleSheets.item(0)
-      if (item.addRule) {
-        item.addRule(
-          `.${this._randomPlaceholderClass}::placeholder`,
-          `font-size: ${formatUnit(fontSize)}; color: ${color};`
+      if (item.insertRule) {
+        item.insertRule(
+          `.${this._randomPlaceholderClass}::placeholder {font-size: ${formatUnit(fontSize)}; color: ${color};}`,
+          item.cssRules.length
         )
       }
     }

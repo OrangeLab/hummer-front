@@ -1,5 +1,5 @@
 import { View, ViewStyle } from './View'
-
+import { formatUnit } from '../../common/utils'
 // TODO Image Component 对接
 export interface ImageStyle extends ViewStyle {
   // 图片拉伸模式
@@ -35,7 +35,7 @@ export class Image extends View {
             this.setImageResizeMode(value)
             break
           default:
-            this.node.style[key] = value
+            this.node.style[key] = formatUnit(value)
         }
         return true
       }
@@ -75,6 +75,13 @@ export class Image extends View {
     }
   }
 
+  get style() {
+    return this._style
+  }
+
+  set style(_style: ImageStyle) {
+    this._style = Object.assign(this._style, _style)
+  }
   get src() {
     return this._src
   }
