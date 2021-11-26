@@ -11,32 +11,30 @@ export class Toast {
   show(msg: string, duration?: number) {
     let that = this
     that.customView.removeAll()
-    clearTimeout(this.toastTimer)
+    clearTimeout(that.toastTimer)
     that.customView.node.innerHTML = msg
     that.customView.style.display = 'flex'
     that.customView.style.opacity = 1
-    this.toastTimer = setTimeout(() => {
-      that.customView.node.addEventListener('transitionend',function(){
-        that.customView.style.display = 'none'
-        that.customView.node.removeEventListener('transitionend',arguments.callee,false);
-      })
+    that.toastTimer = setTimeout(() => {
+      that.customView.node.addEventListener('transitionend',that.hide.bind(that))
       that.customView.style.opacity = 0
     }, duration || 2000)
   }
   custom(view: View, duration?: number) {
     let that = this
     that.customView.removeAll()
-    clearTimeout(this.toastTimer)
+    clearTimeout(that.toastTimer)
     that.customView.node.innerHTML = view
     that.customView.style.display = 'flex'
     that.customView.style.opacity = 1
-    this.toastTimer = setTimeout(() => {
-      that.customView.node.addEventListener('transitionend',function(){
-        that.customView.style.display = 'none'
-        that.customView.node.removeEventListener('transitionend',arguments.callee,false);
-      })
+    that.toastTimer = setTimeout(() => {
+      that.customView.node.addEventListener('transitionend',that.hide.bind(that))
       that.customView.style.opacity = 0
     }, duration || 2000)
+  }
+  private hide(){
+    this.customView.style.display = 'none'
+    this.customView.node.removeEventListener('transitionend',this.hide,false);
   }
 }
 
