@@ -30,6 +30,19 @@ export function formatUnit(size: number | string) {
   }
 }
 
+/**
+ * 格式化纯数字px单位
+ * @param size 
+ * @returns 
+ */
+export function formatPureNumberPxUnit(size: number | string):number {
+  let formatUnitResult = formatUnit(size)
+  if(formatUnitResult.indexOf('rem') !== -1) {
+    return (parseFloat(formatUnitResult) / 750 * window.screen.width);
+  } else if(formatUnitResult.indexOf('px') !== -1) {
+    return parseFloat(formatUnitResult.replace('px', ''))
+  }
+}
 
 /**
  * 将字符串转换为判断是否存在对象中的字符串，空间换时间

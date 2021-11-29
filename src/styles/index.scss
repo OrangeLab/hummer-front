@@ -5,11 +5,16 @@
 @import "./scroll";
 @import "./swiper";
 
+html{
+  width: 100%;
+  height: 100%;
+}
 body {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-
+  width: 100%;
+  height: 100%;
   div,
   button,
   input,
@@ -18,6 +23,7 @@ body {
   p,
   image,
   view,
+  canvas,
   text {
     padding: 0;
     margin: 0;

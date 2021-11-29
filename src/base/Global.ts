@@ -32,5 +32,5 @@ export class HummerGlobal {
     })
   }
 }
-
+globalThis.Hummer =  new HummerGlobal()
 export const Hummer = new HummerGlobal()
