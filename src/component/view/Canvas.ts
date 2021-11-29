@@ -28,6 +28,46 @@ export class CanvasView extends View {
         this.ctx.lineWidth = formatPureNumberPxUnit(widthValue)
     }
     /**
+     * 设置线头样式
+     * @param value 0 : LineCapButt, ， 1:LineCapRound   2:LineCapSquare
+     */
+    lineCap(value) {
+        switch (value) {
+            case 0:
+                this.ctx.lineCap = 'butt'
+                break;
+            case 1:
+                this.ctx.lineCap = 'round'
+                break;
+            case 2:
+                this.ctx.lineCap = 'square'
+                break;
+            default:
+                this.ctx.lineCap = 'butt'
+                break;
+        }
+    }
+    /**
+     * 设置折线折点样式
+     * @param value 0 : LineJoinMiter, ， 1: LineJoinRound  2:LineJoinBevel
+     */
+    lineJoin(value) {
+        switch (value) {
+            case 0:
+                this.ctx.lineCap = 'miter'
+                break;
+            case 1:
+                this.ctx.lineCap = 'round'
+                break;
+            case 2:
+                this.ctx.lineCap = 'bevel'
+                break;
+            default:
+                this.ctx.lineCap = 'miter'
+                break;
+        }
+    }
+    /**
      * 设置stroke的线颜色
      * @param colorHex 色值
      */
@@ -160,7 +200,7 @@ export class CanvasView extends View {
         x = formatPureNumberPxUnit(x)
         y = formatPureNumberPxUnit(y)
         radius = formatPureNumberPxUnit(radius)
-        console.log(x,y,radius)
+        console.log(x, y, radius)
         let lineColor = this.ctx.strokeStyle
         this.ctx.beginPath()
         this.lineColor('rgba(0,0,0,0)')
