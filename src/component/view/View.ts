@@ -5,6 +5,7 @@ import { PanEvent, PanState } from '../event/PanEvent'
 import { PinchEvent, PinchState } from '../event/PinchEvent'
 import { SwipeEvent, SwipeState } from '../event/SwipeEvent'
 import { TapEvent, TapState } from '../event/TapEvent'
+import { TouchEvent, TouchState } from '../event/TouchEvent'
 import { LongPressEvent, LongPressState } from '../event/LongPressEvent'
 import { ScrollEvent } from '../event/ScrollEvent'
 import { BasicAnimation } from '../BasicAnimation'
@@ -362,7 +363,7 @@ export class View {
           ev.target = this
           ev.timestamp = e.timeStamp
           ev.state = PanState.CHANGED
-          ev.translation = { deltaX: e.srcEvent.clientX - oldDeltaX, deltaY: e.srcEvent.clientY - oldDeltaY}
+          ev.translation = { deltaX: e.srcEvent.clientX - oldDeltaX, deltaY: e.srcEvent.clientY - oldDeltaY }
           oldDeltaX = e.srcEvent.clientX
           oldDeltaY = e.srcEvent.clientY
           this.listeners[key].forEach(listener => listener(ev))
@@ -388,7 +389,7 @@ export class View {
         const hammer = new Hammer(this.node)
         hammer.get('pan').set({
           direction: Hammer.DIRECTION_ALL,
-          threshold:0.1
+          threshold: 0.1
         });
         hammer.on('panstart', panstart)
         hammer.on('panmove', panmove)
@@ -512,8 +513,8 @@ export class View {
           const ev = new TapEvent()
           ev.target = this
           ev.position = {
-            x: event.center.x + 'dp',
-            y: event.center.y + 'dp'
+            x: event.center.x,
+            y: event.center.y
           }
           ev.timestamp = event.timeStamp
           ev.state = TapState.BEGAN
@@ -526,7 +527,6 @@ export class View {
       } else if (key === 'input') {
         const input = (e: any) => {
           if (!this.enabled) return
-
           const ev = new InputEvent()
           ev.target = this
           ev.state = InputState.CHANGED
@@ -544,7 +544,6 @@ export class View {
         }
         const blur = (e: any) => {
           if (!this.enabled) return
-
           const ev = new InputEvent()
           ev.target = this
           ev.state = InputState.ENDED
@@ -558,13 +557,49 @@ export class View {
       } else if (key === 'scroll') {
         const scroll = () => {
           if (!this.enabled) return
-
           const ev = new ScrollEvent()
           ev.target = this
           this.listeners[key].forEach(listener => listener(ev))
         }
         this.node.addEventListener(key, scroll)
         this.eventListeners[key] = { scroll }
+      } else if (key === 'touch') {
+        const touch = (e) => {
+          e.stopPropagation && e.stopPropagation();
+          e.preventDefault && e.preventDefault();
+          if (!this.enabled) return
+          const ev = new TouchEvent()
+          ev.target = this
+          ev.timestamp = e.timeStamp
+          ev.position = {
+            x:e.targetTouches[0]?.clientX-e.target?.getBoundingClientRect().left,
+            y:e.targetTouches[0]?.clientY-e.target?.getBoundingClientRect().top,
+          }
+          switch (e.type) {
+            case 'touchstart':
+              ev.state = TouchState.BEGAN
+              break;
+            case 'touchmove':
+              ev.state = TouchState.CHANGED
+              break;
+            case 'touchend':
+              ev.position = {
+                x:e.changedTouches[0]?.clientX-e.target?.getBoundingClientRect().left,
+                y:e.changedTouches[0]?.clientY-e.target?.getBoundingClientRect().top,
+              }
+              ev.state = TouchState.ENDED
+              break;
+            case 'touchcancel':
+              ev.state = TouchState.CANCELLED
+              break;
+          }
+          this.listeners[key].forEach(listener => listener(ev))
+        }
+        this.node.addEventListener('touchstart', touch, false)
+        this.node.addEventListener('touchmove', touch, false)
+        this.node.addEventListener('touchend', touch, false)
+        this.node.addEventListener('touchcancel', touch, false)
+        this.eventListeners[key] = { touch }
       }
     }
   }
@@ -628,6 +663,12 @@ export class View {
         } else if (key === 'scroll') {
           const { scroll } = this.eventListeners[key]
           this.node.removeEventListener('scroll', scroll)
+        } else if (key === 'touch') {
+          const { touch } = this.eventListeners[key]
+          this.node.removeEventListener('touchstart', touch, false)
+          this.node.removeEventListener('touchmove', touch, false)
+          this.node.removeEventListener('touchend', touch, false)
+          this.node.removeEventListener('touchcancel', touch, false)
         }
         this.eventListeners[key] = void 0
       }
