@@ -11,7 +11,7 @@ export enum SwipeState {
 
 export class SwipeEvent extends Event {
   public state!: SwipeState
-  public direction!: 'left' | 'right' | 'up' | 'down'
+  public direction!: 1 | 2 | 4 | 8
   public timestamp!: string
 
   get type(): EventType {

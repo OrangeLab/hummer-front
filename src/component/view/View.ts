@@ -344,13 +344,16 @@ export class View {
         hammer.on('pressup', pressup)
         this.eventListeners[key] = { hammer, press, pressup }
       } else if (key === 'pan') {
+        let oldDeltaX = 0, oldDeltaY = 0;
         const panstart = (e: any) => {
           if (!this.enabled) return
           const ev = new PanEvent()
           ev.target = this
           ev.timestamp = e.timeStamp
           ev.state = PanState.BEGAN
-          ev.translation = { deltaX: e.deltaX + 'dp', deltaY: e.deltaY + 'dp' }
+          oldDeltaX = e.srcEvent.clientX
+          oldDeltaY = e.srcEvent.clientY
+          ev.translation = { deltaX: 0, deltaY: 0 }
           this.listeners[key].forEach(listener => listener(ev))
         }
         const panmove = (e: any) => {
@@ -359,7 +362,9 @@ export class View {
           ev.target = this
           ev.timestamp = e.timeStamp
           ev.state = PanState.CHANGED
-          ev.translation = { deltaX: e.deltaX + 'dp', deltaY: e.deltaY + 'dp' }
+          ev.translation = { deltaX: e.srcEvent.clientX - oldDeltaX, deltaY: e.srcEvent.clientY - oldDeltaY}
+          oldDeltaX = e.srcEvent.clientX
+          oldDeltaY = e.srcEvent.clientY
           this.listeners[key].forEach(listener => listener(ev))
         }
         const panend = (e: any) => {
@@ -368,7 +373,7 @@ export class View {
           ev.target = this
           ev.timestamp = e.timeStamp
           ev.state = PanState.ENDED
-          ev.translation = { deltaX: e.deltaX + 'dp', deltaY: e.deltaY + 'dp' }
+          ev.translation = { deltaX: 0, deltaY: 0 }
           this.listeners[key].forEach(listener => listener(ev))
         }
         const pancancel = (e: any) => {
@@ -377,10 +382,14 @@ export class View {
           ev.target = this
           ev.timestamp = e.timeStamp
           ev.state = PanState.CANCELLED
-          ev.translation = { deltaX: e.deltaX + 'dp', deltaY: e.deltaY + 'dp' }
+          ev.translation = { deltaX: 0, deltaY: 0 }
           this.listeners[key].forEach(listener => listener(ev))
         }
         const hammer = new Hammer(this.node)
+        hammer.get('pan').set({
+          direction: Hammer.DIRECTION_ALL,
+          threshold:0.1
+        });
         hammer.on('panstart', panstart)
         hammer.on('panmove', panmove)
         hammer.on('panend', panend)
@@ -431,6 +440,7 @@ export class View {
           this.listeners[key].forEach(listener => listener(ev))
         }
         const hammer = new Hammer(this.node)
+        hammer.get('pinch').set({ enable: true });
         hammer.on('pinchstart', pinchstart)
         hammer.on('pinchmove', pinchmove)
         hammer.on('pinchend', pinchend)
@@ -450,7 +460,7 @@ export class View {
           ev.target = this
           ev.timestamp = e.timeStamp
           ev.state = SwipeState.BEGAN
-          ev.direction = 'left'
+          ev.direction = 2
           this.listeners[key].forEach(listener => listener(ev))
         }
         const swiperight = (e: any) => {
@@ -460,7 +470,7 @@ export class View {
           ev.target = this
           ev.timestamp = e.timeStamp
           ev.state = SwipeState.BEGAN
-          ev.direction = 'right'
+          ev.direction = 1
           this.listeners[key].forEach(listener => listener(ev))
         }
         const swipeup = (e: any) => {
@@ -470,7 +480,7 @@ export class View {
           ev.target = this
           ev.timestamp = e.timeStamp
           ev.state = SwipeState.BEGAN
-          ev.direction = 'up'
+          ev.direction = 4
           this.listeners[key].forEach(listener => listener(ev))
         }
         const swipedown = (e: any) => {
@@ -480,7 +490,7 @@ export class View {
           ev.target = this
           ev.timestamp = e.timeStamp
           ev.state = SwipeState.BEGAN
-          ev.direction = 'down'
+          ev.direction = 8
           this.listeners[key].forEach(listener => listener(ev))
         }
         const hammer = new Hammer(this.node)
@@ -632,7 +642,6 @@ export class View {
     } else if (animation instanceof KeyframeAnimation) {
       // 帧动画
       const { keyframes, options } = this.getKeyframeAnimationOptions(animation)
-      console.log(keyframes, options)
       const animate: Animation = this.node.animate(keyframes, options)
       this.animations[key] = animate
       animation.onstart && animation.onstart()
