@@ -17,6 +17,7 @@ export class KeyframeAnimation {
   easing?: EasingType
   onstart!: Function
   onend!: Function
+  delay: number
   on(type: string, callback: Function) {
     callback()
   }

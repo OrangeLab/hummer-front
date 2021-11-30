@@ -25,6 +25,24 @@ export function formatUnit(size: number | string) {
       size = parseFloat(size) / Hummer.env.scale;
       return `${size}px`
     } else {
+      if (size.match(/rotate3d|rotateX|rotateY|rotateZ|rotate/g)) {
+        size = size.replace(/(rotate3d|rotateX|rotateY|rotateZ|rotate)\(([\d\D]*?)\)/g, function (word) {
+          if (/rotate3d\(([\d\D]*?)\)/.test(word)) {
+            return `${word.split(',')[0]},${word.split(',')[1]},${word.split(',')[2]},${parseFloat(word.split(',')[3])}deg)`
+          } else {
+            return `${word.split('(')[0]}(${parseFloat(word.split('(')[1])}deg)`
+          }
+        })
+      }
+      if (size.match(/skewY|skewX|skew/g)) {
+        size = size.replace(/(skewY|skewX|skew)\(([\d\D]*?)\)/g, function (word) {
+          if (/skew\(([\d\D]*?)\)/.test(word)) {
+            return `${word.split('(')[0]}(${parseFloat(word.split('(')[1].split(',')[0])}deg,${parseFloat(word.split('(')[1].split(',')[1])}deg)`
+          } else {
+            return `${word.split('(')[0]}(${parseFloat(word.split('(')[1])}deg)`
+          }
+        })
+      }
       return size
     }
   }

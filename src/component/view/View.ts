@@ -9,8 +9,9 @@ import { LongPressEvent, LongPressState } from '../event/LongPressEvent'
 import { ScrollEvent } from '../event/ScrollEvent'
 import { BasicAnimation } from '../BasicAnimation'
 import { KeyframeAnimation } from '../KeyframeAnimation'
-
-import {styleTransformer} from '../../common/style'
+import { formatUnit } from '../../common/utils'
+import { isNeedUnitTrasform } from '../../common/style/transformer/unit'
+import { styleTransformer } from '../../common/style'
 export const SIZE_STYLE: Array<any> = [
   'top',
   'left',
@@ -59,20 +60,20 @@ export interface ViewStyle {
   flexDirection?: 'row' | 'column'
   flexWrap?: 'nowrap' | 'wrap' | 'wrap-reverse'
   justifyContent?:
-    | 'flex-start'
-    | 'flex-end'
-    | 'center'
-    | 'space-between'
-    | 'space-around'
-    | 'space-evenly'
+  | 'flex-start'
+  | 'flex-end'
+  | 'center'
+  | 'space-between'
+  | 'space-around'
+  | 'space-evenly'
   alignItems?: 'flex-start' | 'flex-end' | 'center' | 'baseline' | 'stretch'
   alignContent?:
-    | 'flex-start'
-    | 'flex-end'
-    | 'center'
-    | 'space-between'
-    | 'space-around'
-    | 'stretch'
+  | 'flex-start'
+  | 'flex-end'
+  | 'center'
+  | 'space-between'
+  | 'space-around'
+  | 'stretch'
   order?: number
   flexGrow?: number
   flexShrink?: number
@@ -112,7 +113,7 @@ export interface ViewStyle {
   transitionProperty?: string,
   transitionDuration?: string | number,
   transitionTimingFunction?: 'linear' | 'ease-in' | 'ease-out' | 'ease-in-out'
-  
+
 }
 
 export type EventType =
@@ -139,14 +140,14 @@ export class View {
     | any
 
   public hmNode?: any
-
+  public basicAnimationArray: Array<any> = []
   // 子类可访问属性
   protected _enabled: boolean // 是否响应交互
   protected subViews: Set<View>
   protected _style: ViewStyle
   protected listeners: { [key: string]: Array<EventListener> }
   protected eventListeners: {
-    [key: string]: { hammer?: any; listener?: Function; [key: string]: any }
+    [key: string]: { hammer?: any; listener?: Function;[key: string]: any }
   }
   protected animations: { [key: string]: Animation }
   isHighlight?: Boolean
@@ -174,7 +175,47 @@ export class View {
     )
     this.defaultStyle()
     this.initialize()
+    window.addEventListener('render-ready', () => {
+      this.formatBasicAnimation()
+    })
   }
+  private playBasicAnimation(animation) {
+    const {
+      keyframes,
+      options
+    } = this.getBasicAnimationKeyFrameAnimationOptions(animation)
+    const animate: Animation = this.node.animate(keyframes, options)
+    // this.animations[key] = animate
+    animation.onstart && animation.onstart()
+    animate.onfinish = () => {
+      this.basicAnimationArray.shift()
+      animation.onend && animation.onend()
+      if (this.basicAnimationArray.length >= 1) {
+        this.playBasicAnimation(this.basicAnimationArray[this.basicAnimationArray.length - 1])
+      }
+    }
+    animate.play()
+  }
+
+  private formatBasicAnimation() {
+    let newBasicAnimationArray: Array<Array<any>> = []
+    let numSize = -1
+    let oldKeyNum
+    this.basicAnimationArray.forEach(item => {
+      let keyNum = parseInt(Object.keys(item)[0].split('_')[Object.keys(item)[0].split('_').length - 2]);
+      if (oldKeyNum !== keyNum) {
+        numSize++
+      }
+      oldKeyNum = keyNum
+      !newBasicAnimationArray[numSize] && (newBasicAnimationArray[numSize] = [])
+      newBasicAnimationArray[numSize].push(item[Object.keys(item)[0]])
+    });
+    this.basicAnimationArray = newBasicAnimationArray
+    if (this.basicAnimationArray.length > 0) {
+      this.playBasicAnimation(this.basicAnimationArray[0])
+    }
+  }
+
   protected defaultStyle() {
     this.node.classList.add('hm-default-view')
   }
@@ -208,12 +249,12 @@ export class View {
   /**
    * 初始化生命周期函数，目前在前端SDK上没用，兼容端的代码
    */
-  initialize() {}
+  initialize() { }
 
   /**
    * 销毁时机
    */
-  finalize() {}
+  finalize() { }
 
   // Mounted 生命周期
   // @ts-ignore
@@ -585,44 +626,13 @@ export class View {
 
   addAnimation(animation: BasicAnimation | KeyframeAnimation, key: string) {
     if (animation instanceof BasicAnimation) {
-      // setTimeout(() => {
-      //   console.warn('trigger', animation.path)
-      //   // 属性动画
-      //   const properties = this.getTransitionProperties(animation)
-      //   // https://www.jianshu.com/p/42e817f1c4bc
-      //   for (let key in properties) {
-      //     this.node.style[key] = properties[key]
-      //   }
-      //   const onTransitionStart = (e) => {
-      //     if (e.propertyName === animation.path) {
-      //       animation.onstart()
-      //     }
-      //   }
-      //   const onTransitionEnd = (e) => {
-      //     if (e.propertyName === animation.path) {
-      //       animation.onend()
-      //     }
-      //   }
-      //   animation.onstart && this.node.addEventListener('transitionstart', onTransitionStart, true)
-      //   animation.onend && this.node.addEventListener('transitionend', onTransitionEnd, true)
-      // }, animation.delay)
-
-      const {
-        keyframes,
-        options
-      } = this.getBasicAnimationKeyFrameAnimationOptions(animation)
-      const that = this
-      // window.addEventListener('render-ready', () =>  {
-
-      const animate: Animation = that.node.animate(keyframes, options)
-      this.animations[key] = animate
-      animation.onstart && animation.onstart()
-      animation.onend && (animate.oncancel = animation.onend as any)
-      animate.play()
-      // })
+      let a = {}
+      a[`${key}`] = animation
+      this.basicAnimationArray.push(a);
     } else if (animation instanceof KeyframeAnimation) {
       // 帧动画
       const { keyframes, options } = this.getKeyframeAnimationOptions(animation)
+      console.log(keyframes, options)
       const animate: Animation = this.node.animate(keyframes, options)
       this.animations[key] = animate
       animation.onstart && animation.onstart()
@@ -631,38 +641,38 @@ export class View {
     }
   }
 
-  removeAllAnimation() {
-    for (let key in this.animations) {
-      const animate: Animation = this.animations[key]
-      animate.pause()
-      animate.finish()
-    }
-    this.animations = {}
-  }
+  // removeAllAnimation() {
+  //   for (let key in this.animations) {
+  //     const animate: Animation = this.animations[key]
+  //     animate.pause()
+  //     animate.finish()
+  //   }
+  //   this.animations = {}
+  // }
 
-  removeAnimationForKey(key: string) {
-    const animate: Animation = this.animations[key]
-    if (animate) {
-      animate.pause()
-      animate.finish()
-      // @ts-ignore
-      this.animations[key] = null
-    }
-  }
+  // removeAnimationForKey(key: string) {
+  //   const animate: Animation = this.animations[key]
+  //   if (animate) {
+  //     animate.pause()
+  //     animate.finish()
+  //     // @ts-ignore
+  //     this.animations[key] = null
+  //   }
+  // }
 
   getRect(callback: Function) {
     callback({})
   }
 
   dbg_highlight(isHighlight: Boolean) {
-    !!isHighlight ? this.node.classList.add('hm-high-light'):this.node.classList.remove('hm-high-light')
+    !!isHighlight ? this.node.classList.add('hm-high-light') : this.node.classList.remove('hm-high-light')
   }
 
-  resetStyle() {}
+  resetStyle() { }
 
-  requestViewWidth(callback: Function) {}
+  requestViewWidth(callback: Function) { }
 
-  requestViewHeight(callback: Function) {}
+  requestViewHeight(callback: Function) { }
 
   // /**
   //  * @deprecated
@@ -681,46 +691,62 @@ export class View {
    * 获取属性动画的原始值(第一帧值)
    */
   private getBasicAnimationDefaultKeyframeAnimationOptions(
-    ani: BasicAnimation
+    ani: Array<BasicAnimation>
   ) {
-    switch (ani.path) {
-      case 'position':
-      case 'scale':
-      case 'scaleX':
-      case 'scaleY':
-      case 'rotationX':
-      case 'rotationY':
-      case 'rotationZ':
-        return { transform: getComputedStyle(this.node)['transform'] }
-      case 'opacity':
-        return { opacity: getComputedStyle(this.node)['opacity'] }
-      case 'backgroundColor':
-        return {
-          backgroundColor: getComputedStyle(this.node)['backgroundColor']
-        }
-    }
+    let playKeyframes = {}
+    ani.forEach((item) => {
+      switch (item.path) {
+        case 'position':
+        case 'scale':
+        case 'scaleX':
+        case 'scaleY':
+        case 'rotationX':
+        case 'rotationY':
+        case 'rotationZ':
+          playKeyframes['transform'] = getComputedStyle(this.node)['transform']
+          break;
+        case 'opacity':
+          playKeyframes['opacity'] = getComputedStyle(this.node)['opacity']
+          break;
+        case 'backgroundColor':
+          playKeyframes['backgroundColor'] = getComputedStyle(this.node)['backgroundColor']
+          break;
+        default:
+          // @ts-ignore
+          playKeyframes[`${item.path}`] = getComputedStyle(this.node)[`${item.path}`]
+          break;
+      }
+    })
+    return playKeyframes
   }
 
   /**
    * 获取属性动画的结果值(最后一帧值)
    */
-  private getBasicAnimationKeyFrameAnimationOptions(ani: BasicAnimation) {
-    return {
-      keyframes: [
-        this.getBasicAnimationDefaultKeyframeAnimationOptions(ani),
-        {
-          [this.convertPath(ani.path)]: this.convertPathValue(
-            ani.path,
-            ani.value
-          ),
-          offset: 1,
-          easing: ani.easing
+  private getBasicAnimationKeyFrameAnimationOptions(ani: Array<BasicAnimation>) {
+    let keyframes, endKeyframes = {}
+    ani.forEach(item => {
+      if (this.convertPath(item.path) === 'transform') {
+        if (endKeyframes['transform']) {
+          endKeyframes['transform'] = `${this.convertPathValue(item.path, item.value)} ${endKeyframes['transform']}`
+        } else {
+          endKeyframes['transform'] = this.convertPathValue(item.path, item.value)
         }
-      ],
+      } else {
+        endKeyframes[`${this.convertPath(item.path)}`] = this.convertPathValue(item.path, item.value)
+      }
+      endKeyframes['easing'] = item.easing
+    })
+    keyframes = [this.getBasicAnimationDefaultKeyframeAnimationOptions(ani), endKeyframes];
+    return {
+      keyframes: keyframes,
       options: {
+        fill: 'forwards',
+        easing: ani[0].easing,
+        delay: ani[0].delay || 0,
         direction: 'normal',
-        duration: ani.duration,
-        iterations: ani.repeatCount
+        duration: ani[0].duration * 1000,
+        iterations: ani[0].repeatCount < 0 ? 'Infinity' : (ani[0].repeatCount === 0 || ani[0].repeatCount === 1 ? 1 : ani[0].repeatCount)
       }
     }
   }
@@ -734,9 +760,12 @@ export class View {
     return {
       keyframes,
       options: {
+        fill: 'forwards',
+        easing: ani.easing,
+        delay: ani.delay || 0,
         direction: 'normal',
-        duration: ani.duration,
-        iterations: ani.repeatCount
+        duration: ani.duration * 1000,
+        iterations: ani.repeatCount < 0 ? 'Infinity' : (ani.repeatCount === 0 || ani.repeatCount === 1 ? 1 : ani.repeatCount)
       }
     }
   }
@@ -759,22 +788,23 @@ export class View {
   private convertPathValue(path: string, value: any) {
     switch (path) {
       case 'position':
-        return `translate(${value.x},${value.y})`
+        return `translate(${formatUnit(value.x)},${formatUnit(value.y)})`
       case 'rotationX':
-        return `rotationX(${value}deg)`
+        return `rotate3d(1,0,0,${value}deg)`
       case 'rotationY':
-        return `rotationY(${value}deg)`
+        return `rotate3d(0,1,0,${value}deg)`
       case 'rotationZ':
-        return `rotationY(${value}deg)`
+        return `rotate3d(0,0,1,${value}deg)`
       case 'scale':
-        return `scale(${value})`
+        return `scale3d(${value},${value},1)`
       case 'scaleX':
-        return `scaleX(${value})`
+        return `scale3d(${value},1,1)`
       case 'scaleY':
-        return `scaleY(${value})`
-      case 'opacity':
-      case 'backgroundColor':
+        return `scale3d(1,${value},1)`
       default:
+        if (isNeedUnitTrasform(path)) {
+          return formatUnit(value)
+        }
         return value
     }
   }
