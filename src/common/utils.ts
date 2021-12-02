@@ -53,11 +53,11 @@ export function formatUnit(size: number | string) {
  * @param size 
  * @returns 
  */
-export function formatPureNumberPxUnit(size: number | string):number {
+export function formatPureNumberPxUnit(size: number | string): number {
   let formatUnitResult = formatUnit(size)
-  if(formatUnitResult.indexOf('rem') !== -1) {
+  if (formatUnitResult.indexOf('rem') !== -1) {
     return (parseFloat(formatUnitResult) / 750 * window.screen.width);
-  } else if(formatUnitResult.indexOf('px') !== -1) {
+  } else if (formatUnitResult.indexOf('px') !== -1) {
     return parseFloat(formatUnitResult.replace('px', ''))
   }
 }
@@ -117,4 +117,18 @@ export const nodeObserver = (node: | HTMLElement
     callback(mutations)
   })
   nodeObserver.observe(node)
+}
+
+/**
+ * 获取url参数
+ * @param key 参数的key
+ */
+ export const getQueryVariable = (key:string) => {
+  var query = window.location.search.substring(1);
+  var vars = query.split("&");
+  for (var i = 0; i < vars.length; i++) {
+    var pair = vars[i].split("=");
+    if (pair[0] == key) { return pair[1]; }
+  }
+  return (false);
 }
