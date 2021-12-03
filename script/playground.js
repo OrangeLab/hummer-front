@@ -44,8 +44,8 @@ function run() {
         let newInjectJsUrls = []
         newInjectJsUrls[0] = `${injectJsUrls[0]}${pathName}.js`
         const filePath = path.join(rootPath, 'pages/index.html')
-        const cssPath = 'http://localhost:5002/index-browser.css'
-        const jsPath = 'http://localhost:5002/index-browser.js'
+        const cssPath = 'http://172.23.166.18:5002/index-browser.css'
+        const jsPath = 'http://172.23.166.18:5002/index-browser.js'
         fs.readFile(filePath, function (err, data) {
           if (err) {
             console.log(err);
