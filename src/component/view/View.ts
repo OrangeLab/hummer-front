@@ -151,6 +151,11 @@ export class View {
     [key: string]: { hammer?: any; listener?: Function;[key: string]: any }
   }
   protected animations: { [key: string]: Animation }
+  protected onCreate?: Function // 页面首次加载时触发
+  protected onAppear?: Function // 页面显示
+  protected onDisappear?: Function // 页面隐藏
+  protected onDestroy?: Function // 页面销毁
+  protected onBack?: Function // 页面返回
   isHighlight?: Boolean
 
   layout!: () => void
@@ -178,8 +183,62 @@ export class View {
     this.initialize()
     window.addEventListener('render-ready', () => {
       this.formatBasicAnimation()
+      this?.onCreate && this.onCreate()
+      this?.onAppear && this.onAppear()
+      if (this?.onAppear || this?.onDisappear) {
+        document.addEventListener("visibilitychange", this.visibilityChange.bind(this));
+      }
+      if (this?.onBack) {
+        if (window.history && window.history.pushState) {
+          history.pushState(null, null, document.URL);
+          window.addEventListener('popstate', this.interceptBack.bind(this), false);
+        }
+      }
+      // if (this?.onCreate) {
+      //   window.onbeforeunload = () => {
+      //     this._onDestoryed();
+      //     // this?.onBack && history.go(-1);
+      //   };
+      // }
     })
   }
+  visibilityChange() {
+    if (document.visibilityState === 'visible') {
+      this.onAppear()
+    } else {
+      this.onDisappear()
+    }
+  }
+  interceptBack() {
+    console.log('123123');
+    let isIntercept = this?.onBack()
+    if (isIntercept) {
+      history.pushState(null, null, document.URL);
+    } else {
+      this._onDestoryed();
+      history.go(-1);
+    }
+  }
+  //   /**
+  //    * 页面首次加载时触发
+  //    */
+  //   onCreate() { }
+  //   /**
+  //   * 页面显示周期
+  //   */
+  //   onAppear() { }
+  //   /**
+  //    * 页面隐藏
+  //    */
+  //   onDisappear() { }
+  //   /**
+  //   * 页面销毁
+  //   */
+  //   onDestroy() { }
+  //   /**
+  //  * 页面返回
+  //  */
+  //   onBack() { }
   private playBasicAnimation(animation) {
     const {
       keyframes,
@@ -269,6 +328,9 @@ export class View {
   // @ts-ignore
   private _onDestoryed() {
     this.onDestoryed();
+    this?.onDestroy && this.onDestroy();
+    this?.onAppear && document.removeEventListener('visibilityChange', this.visibilityChange.bind(this))
+    this?.onBack && window.removeEventListener('popstate', this.visibilityChange.bind(this))
   }
 
   protected onDestoryed() { }
@@ -572,8 +634,8 @@ export class View {
           ev.target = this
           ev.timestamp = e.timeStamp
           ev.position = {
-            x:e.targetTouches[0]?.clientX-e.target?.getBoundingClientRect().left,
-            y:e.targetTouches[0]?.clientY-e.target?.getBoundingClientRect().top,
+            x: e.targetTouches[0]?.clientX - e.target?.getBoundingClientRect().left,
+            y: e.targetTouches[0]?.clientY - e.target?.getBoundingClientRect().top,
           }
           switch (e.type) {
             case 'touchstart':
@@ -584,8 +646,8 @@ export class View {
               break;
             case 'touchend':
               ev.position = {
-                x:e.changedTouches[0]?.clientX-e.target?.getBoundingClientRect().left,
-                y:e.changedTouches[0]?.clientY-e.target?.getBoundingClientRect().top,
+                x: e.changedTouches[0]?.clientX - e.target?.getBoundingClientRect().left,
+                y: e.changedTouches[0]?.clientY - e.target?.getBoundingClientRect().top,
               }
               ev.state = TouchState.ENDED
               break;
