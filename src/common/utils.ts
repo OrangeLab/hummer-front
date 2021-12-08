@@ -123,12 +123,32 @@ export const nodeObserver = (node: | HTMLElement
  * 获取url参数
  * @param key 参数的key
  */
- export const getQueryVariable = (key:string) => {
-  var query = window.location.search.substring(1);
+ export const getQueryVariable = (key:string,url?:string) => {
+  var query = url?url.split('?')[1]:window.location.search.substring(1);
   var vars = query.split("&");
   for (var i = 0; i < vars.length; i++) {
     var pair = vars[i].split("=");
     if (pair[0] == key) { return pair[1]; }
   }
   return (false);
+}
+
+/**
+ * 添加或者修改url参数
+ * @param url 需要添加的url
+ * @param key 参数的key
+ * @param value 参数的value
+ */
+export const updateQueryStringParameter = (url:string, key:string, value:any) => {
+	if(!value) {
+		return url;
+	}
+	var re = new RegExp("([?&])" + key + "=.*?(&|$)", "i");
+	var separator = url.indexOf('?') !== -1 ? "&" : "?";
+	if (url.match(re)) {
+		return url.replace(re, '$1' + key + "=" + value + '$2');
+	}
+	else {
+		return url + separator + key + "=" + value;
+	}
 }

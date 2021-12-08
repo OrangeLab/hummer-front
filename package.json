@@ -11,13 +11,14 @@
     "dist"
   ],
   "scripts": {
-    "build": "NODE_ENV=production node ./script/build.js",
-    "dev": "node ./script/dev.js",
+    "build": "NODE_ENV=production node ./script/build.js && npm run copy",
+    "dev": "node ./script/dev.js && npm run copy",
     "dev:example": "npm run dev & npm run example",
     "example": "node ./script/playground.js",
     "comment": "npm run git -- 'commit-msg'  so you can push and update by a auto way",
     "git": "npm run build && git add . && git commit -m",
-    "release": "node ./script/release.js"
+    "release": "node ./script/release.js",
+    "copy": "copyfiles -u 1 ./pages/index.html ./dist"
   },
   "repository": {
     "type": "git",
@@ -42,6 +43,7 @@
     "@types/node": "^15.12.2",
     "@types/resize-observer-browser": "^0.1.6",
     "art-template": "^4.13.2",
+    "copyfiles": "^2.4.1",
     "enquirer": "^2.3.6",
     "execa": "^4.0.3",
     "fs-extra": "^9.0.1",

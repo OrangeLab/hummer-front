@@ -10,7 +10,7 @@ import { LongPressEvent, LongPressState } from '../event/LongPressEvent'
 import { ScrollEvent } from '../event/ScrollEvent'
 import { BasicAnimation } from '../BasicAnimation'
 import { KeyframeAnimation } from '../KeyframeAnimation'
-import { formatUnit } from '../../common/utils'
+import { formatUnit, getQueryVariable } from '../../common/utils'
 import { isNeedUnitTrasform } from '../../common/style/transformer/unit'
 import { styleTransformer } from '../../common/style'
 export const SIZE_STYLE: Array<any> = [
@@ -194,12 +194,25 @@ export class View {
           window.addEventListener('popstate', this.interceptBack.bind(this), false);
         }
       }
-      // if (this?.onCreate) {
-      //   window.onbeforeunload = () => {
-      //     this._onDestoryed();
-      //     // this?.onBack && history.go(-1);
-      //   };
-      // }
+      if (this?.onCreate&&getQueryVariable('navBar')) {
+        let navBar = new View
+        let navBarTitle = new View
+        let navBarBack= new View
+        navBar.node.className = 'hm-default-navbar'
+        navBarTitle.node.className = 'hm-default-nav-title'
+        navBarBack.node.className = 'hm-default-nav-back'
+        navBar.node.onclick = () => {
+          history.go(-1);
+        }
+        navBarTitle.node.innerHTML = window.location.pathname.split('/')[1]
+        if(document.referrer !== ''){
+          navBar.appendChild(navBarBack)
+        }
+        navBar.appendChild(navBarTitle)
+        this.node.childNodes[0].style.flex = 1
+        this.node.insertBefore(navBar.node,this.node.childNodes[0])
+        this.style.overflow='hidden'
+      }
     })
   }
   visibilityChange() {
