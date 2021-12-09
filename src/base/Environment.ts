@@ -21,10 +21,10 @@ export class Environment {
     this.appName = ''
     this.safeAreaBottom = 0
     this.appVersion = ''
-    this.deviceHeight = window.screen.height + 'dp'
-    this.deviceWidth = window.screen.width + 'dp'
-    this.availableHeight = window.screen.availHeight + 'dp'
-    this.availableWidth = window.screen.availWidth + 'dp'
+    this.deviceHeight = ((self != top)?document.body.offsetHeight:window.screen.height) + 'dp'
+    this.deviceWidth = ((self != top)?document.body.offsetWidth:window.screen.width) + 'dp'
+    this.availableHeight = ((self != top)?document.body.offsetHeight:window.screen.availHeight) + 'dp'
+    this.availableWidth = ((self != top)?document.body.offsetHeight:window.screen.availWidth) + 'dp'
     this.statusBarHeight = 0
     this.osVersion = ''
     this.platform = 'web'
