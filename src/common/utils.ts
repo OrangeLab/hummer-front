@@ -47,7 +47,6 @@ export function formatUnit(size: number | string) {
     }
   }
 }
-
 /**
  * 格式化纯数字px单位
  * @param size 
@@ -56,7 +55,7 @@ export function formatUnit(size: number | string) {
 export function formatPureNumberPxUnit(size: number | string): number {
   let formatUnitResult = formatUnit(size)
   if (formatUnitResult.indexOf('rem') !== -1) {
-    return (parseFloat(formatUnitResult) / 750 * window.screen.width);
+    return (parseFloat(formatUnitResult) / 750 * (inIframe()?document.body.offsetWidth:window.screen.width));
   } else if (formatUnitResult.indexOf('px') !== -1) {
     return parseFloat(formatUnitResult.replace('px', ''))
   }
@@ -66,6 +65,7 @@ export function formatPureNumberPxUnit(size: number | string): number {
  * 将字符串转换为判断是否存在对象中的字符串，空间换时间
  * @param str 待判断的字符串 a,b
  * @param expectedLowerCase 是否要转换为小写
+ * @returns 
  */
 export function makeMap(str: string, expectedLowerCase: Boolean = false) {
   const map = Object.create(null)
@@ -80,6 +80,7 @@ export function makeMap(str: string, expectedLowerCase: Boolean = false) {
  * 将数组转换为判断是否存在对象中的字符串，空间换时间
  * @param str 待判断的数组 [a,b]
  * @param expectedLowerCase 是否要转换为小写
+ * @returns 
  */
 export function makeMapByArr(list: any, expectedLowerCase: Boolean = false) {
   const map = Object.create(null)
@@ -93,6 +94,7 @@ export function makeMapByArr(list: any, expectedLowerCase: Boolean = false) {
  * 将数组转换为判断是否存在对象中的字符串，空间换时间
  * @param str 待判断的数组 [a,b]
  * @param expectedLowerCase 是否要转换为小写
+ * @returns 
  */
 export function makeMapByArrOfKebab(list: any) {
   const map = Object.create(null)
@@ -123,8 +125,8 @@ export const nodeObserver = (node: | HTMLElement
  * 获取url参数
  * @param key 参数的key
  */
- export const getQueryVariable = (key:string,url?:string) => {
-  var query = url?url.split('?')[1]:window.location.search.substring(1);
+export const getQueryVariable = (key: string, url?: string) => {
+  var query = url ? url.split('?')[1] : window.location.search.substring(1);
   var vars = query.split("&");
   for (var i = 0; i < vars.length; i++) {
     var pair = vars[i].split("=");
@@ -139,16 +141,27 @@ export const nodeObserver = (node: | HTMLElement
  * @param key 参数的key
  * @param value 参数的value
  */
-export const updateQueryStringParameter = (url:string, key:string, value:any) => {
-	if(!value) {
-		return url;
-	}
-	var re = new RegExp("([?&])" + key + "=.*?(&|$)", "i");
-	var separator = url.indexOf('?') !== -1 ? "&" : "?";
-	if (url.match(re)) {
-		return url.replace(re, '$1' + key + "=" + value + '$2');
-	}
-	else {
-		return url + separator + key + "=" + value;
-	}
+export const updateQueryStringParameter = (url: string, key: string, value: any) => {
+  if (!value) {
+    return url;
+  }
+  var re = new RegExp("([?&])" + key + "=.*?(&|$)", "i");
+  var separator = url.indexOf('?') !== -1 ? "&" : "?";
+  if (url.match(re)) {
+    return url.replace(re, '$1' + key + "=" + value + '$2');
+  }
+  else {
+    return url + separator + key + "=" + value;
+  }
+}
+/**
+ * 判断当前页面是否在iframe里
+ * @returns 
+ */
+export const inIframe = () => {
+  if (self != top) {
+    return true;
+  } else {
+    return false;
+  }
 }

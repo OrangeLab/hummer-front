@@ -1,6 +1,5 @@
 import { View, ViewStyle } from './View'
-import { formatPureNumberPxUnit } from '../../common/utils'
-
+import { formatPureNumberPxUnit, formatUnit } from '../../common/utils'
 export interface CanvasStyle extends ViewStyle { }
 
 export class CanvasView extends View {
@@ -11,13 +10,47 @@ export class CanvasView extends View {
     private resolution!: number
     constructor() {
         super()
+        this._style = new Proxy(this._style, {
+            get: (target, key) => {
+                // 获取style
+                return target[key] || this.node.style[key]
+            },
+            set: (target, key, value) => {
+                // 设置style
+                // @ts-ignore
+                target[key] = value
+                switch (key) {
+                    case 'width':
+                        this.node.style[key] = formatUnit(value)
+                        if (value.indexOf('%') !== -1) {
+                            console.error('canvas宽高不支持设置百分比')
+                        }
+                        this.node.width = formatPureNumberPxUnit(value) * this.resolution
+                        break
+                    case 'height':
+                        this.node.style[key] = formatUnit(value)
+                        if (value.indexOf('%') !== -1) {
+                            console.error('canvas宽高不支持设置百分比')
+                        }
+                        this.node.height = formatPureNumberPxUnit(value) * this.resolution
+                        break
+                    default:
+                        this.node.style[key] = formatUnit(value)
+                }
+                return true
+            }
+        })
+    }
+    get style() {
+        return this._style
     }
 
+    set style(_style: CanvasStyle) {
+        this._style = Object.assign(this._style, _style)
+    }
     protected createNode() {
         this.node = document.createElement('canvas')
         this.resolution = window.devicePixelRatio
-        this.node.width = window.screen.width * this.resolution
-        this.node.height = window.screen.height * this.resolution
         this.ctx = this.node.getContext('2d');
     }
     /**
