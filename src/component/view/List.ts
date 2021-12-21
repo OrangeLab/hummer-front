@@ -338,6 +338,15 @@ export class List extends View {
       const cell: View = this.onCreate(type)
       this.onUpdate((count - this.rowCount) >= 0 ? (index + this.rowCount) : index, cell)
       const row = new View()
+      if (this.style.lineSpacing) {
+        if (index > 0) {
+          if (this.style.scrollDirection === 'horizontal') {
+            row.node.style.marginLeft = formatUnit(this.style.lineSpacing)
+          } else {
+            row.node.style.marginTop = formatUnit(this.style.lineSpacing)
+          }
+        }
+      }
       //如果是水平滚动
       if (this.style.scrollDirection === 'horizontal') {
         this.recyclerView.node.classList.add('horizontal')
