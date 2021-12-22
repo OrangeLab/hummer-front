@@ -31,6 +31,7 @@
   "license": "ISC",
   "dependencies": {
     "@better-scroll/core": "^2.4.2",
+    "@tweenjs/tween.js": "^17.6.0",
     "better-scroll": "^2.4.2",
     "hammerjs": "^2.0.8",
     "swiper": "7.0.8"

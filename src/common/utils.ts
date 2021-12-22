@@ -48,7 +48,7 @@ export function formatUnit(size: number | string) {
   }
 }
 /**
- * 格式化纯数字px单位
+ * tenon样式格式化纯数字px单位
  * @param size 
  * @returns 
  */
@@ -60,6 +60,23 @@ export function formatPureNumberPxUnit(size: number | string): number {
     return parseFloat(formatUnitResult.replace('px', ''))
   }
 }
+
+/**
+ * web样式格式化纯数字px单位
+ * @param size 
+ * @returns 
+ */
+ export function formatWebPureNumberPxUnit(size: string): number {
+  let formatUnitResult = size || '0'
+  if (formatUnitResult.indexOf('rem') !== -1) {
+    return (parseFloat(formatUnitResult) / 750 * (inIframe()?document.body.offsetWidth:window.screen.width));
+  } else if (formatUnitResult.indexOf('px') !== -1) {
+    return parseFloat(formatUnitResult.replace('px', ''))
+  } else {
+    return parseFloat(formatUnitResult)
+  }
+}
+
 
 /**
  * 将字符串转换为判断是否存在对象中的字符串，空间换时间
@@ -119,6 +136,7 @@ export const nodeObserver = (node: | HTMLElement
     callback(mutations)
   })
   nodeObserver.observe(node)
+  return nodeObserver
 }
 
 /**
@@ -165,3 +183,18 @@ export const inIframe = () => {
     return false;
   }
 }
+/**
+ * 节流
+ * @param fn 需要节流的函数
+ * @param wait 节流的时间
+ */
+export const throttle = (fn, wait) => {
+    var timeout;
+    return function() {
+      var ctx = this, args = arguments;
+      clearTimeout(timeout);
+      timeout = setTimeout(function() {
+        fn.apply(ctx, args);
+      }, wait);
+    };
+  }
