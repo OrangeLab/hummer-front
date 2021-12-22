@@ -1,7 +1,8 @@
 import { View, ViewStyle } from './View'
 import Swiper from '../../common/swiper'
 import { nodeObserver } from '../../common/utils'
-import { formatUnit } from '../../common/utils'
+import { styleTransformer } from '../../common/style'
+import Tween from "@tweenjs/tween.js"
 export interface ViewPagerStyle extends ViewStyle {
   width?: string | number
   height?: string | number
@@ -20,14 +21,20 @@ export class ViewPager extends View {
   _data: Array<any> = []
   itemViews!: Array<View>
   itemViewsArray!: Array<any>
-  listeners:{ [key: string]: Array<any> }
+  listeners: { [key: string]: Array<any> }
   private swiper: any
+  private observe: any
   private wrapper: Element
+  private activeProgress: number
+  private endProgress: number
+  private tween: any
+  private swipeDirection: any
   // swiperFrame
   constructor() {
     super()
     this.wrapper = document.createElement('div');
     this.wrapper.classList.add('swiper-wrapper')
+    this.node.appendChild(this.wrapper)
     // @ts-ignore
     this._style = this._style = new Proxy(this._style, {
       get: (target, key) => {
@@ -57,7 +64,7 @@ export class ViewPager extends View {
             }, this.swiper.update())
             break
           default:
-            this.node.style[key] = formatUnit(value)
+            this.node.style[key] = value
         }
         return true
       }
@@ -68,7 +75,6 @@ export class ViewPager extends View {
       },
       set: (target, key, value) => {
         Reflect.set(target, key, value);
-        this.removeAll()
         if (this.listeners['onItemView'] && this.listeners['onItemView'].length > 0) {
           this.listeners['onItemView'].forEach(listener => {
             this.wrapper.innerHTML = ''
@@ -83,26 +89,26 @@ export class ViewPager extends View {
               }
             }
           })
-          this.node.appendChild(this.wrapper)
-          this.init();
+          if (this.node.offsetWidth) {
+            this.init();
+          }
         }
         return true;
       }
     })
-    nodeObserver(this.node, () => {
+    this.observe = nodeObserver(this.node, () => {
       if (this.node.offsetWidth) {
         this.init();
+        this.observe.unobserve(this.node);
       }
     })
   }
 
   init() {
+    let initSuccess = false
     let that = this;
     let translateX = (this.node.offsetWidth - this.style.edgeSpacing * 2) * (this.style.scaleFactor || 0.85) + (this.node.offsetWidth - this.style.edgeSpacing * 2) * ((1 - (this.style.scaleFactor || 0.85)) / 2) + this.style.itemSpacing;
     let transitionFlag = false;
-    if (this.swiper) {
-      this.swiper.destroy();
-    }
     this.swiper = new Swiper(this.node, {
       loop: this.style.canLoop, // 是否可以无限循环
       autoplay: this.style.autoPlay ? {
@@ -110,13 +116,15 @@ export class ViewPager extends View {
         stopOnLastSlide: false,
         disableOnInteraction: false,
       } : false,
-      watchSlidesProgress : true,
+      observer: true,
+      observeParents: true,
+      watchSlidesProgress: true,
       spaceBetween: this.style.itemSpacing as number,
       centeredSlides: true,
+      mousewheel: true,
       loopedSlides: 2,
       slidesPerView: "auto",
       effect: "creative",
-      observer: true,
       creativeEffect: {
         limitProgress: 2,
         prev: {
@@ -132,8 +140,10 @@ export class ViewPager extends View {
       },
       on: {
         slideChange: function (swiper) {
-          if (that.listeners['onPageChange'] && that.listeners['onPageChange'].length > 0) {
-            that.listeners['onPageChange'].forEach(listener => listener(this.realIndex, that.data.length))
+          if (initSuccess) {
+            if (that.listeners['onPageChange'] && that.listeners['onPageChange'].length > 0) {
+              that.listeners['onPageChange'].forEach(listener => listener(this.realIndex, that.data.length))
+            }
           }
         },
         tap: function (swiper, event) {
@@ -141,35 +151,96 @@ export class ViewPager extends View {
             that.listeners['onItemClick'].forEach(listener => listener(this.realIndex))
           }
         },
+        slidePrevTransitionStart: function (swiper) {
+          that.swipeDirection = 'prev'
+        },
+        slideNextTransitionStart: function (swiper) {
+          that.swipeDirection = 'next'
+        },
         transitionStart: function (swiper) {
-          if (that.listeners['onPageScrollStateChange'] && that.listeners['onPageScrollStateChange'].length > 0) {
-            that.listeners['onPageScrollStateChange'].forEach(listener => listener(2))
+          if (initSuccess) {
+            if (that.listeners['onPageScrollStateChange'] && that.listeners['onPageScrollStateChange'].length > 0) {
+              that.listeners['onPageScrollStateChange'].forEach(listener => listener(2))
+            }
+            let previousIndex = parseInt(swiper?.slides[swiper.previousIndex]?.dataset?.swiperSlideIndex)
+            swiper.realIndex === previousIndex && (that.swipeDirection = 'invariant')
+            that.tween = new Tween.Tween({
+              number: transitionFlag ? that.activeProgress : previousIndex
+            }).to({
+              number: that.endProgress >= 1 ? that.endProgress : (that.swipeDirection === 'next' ? Math.ceil(that.activeProgress) : Math.floor(that.activeProgress))
+            }, 300).onUpdate(tween => {
+              let progress
+              if (tween.number >= 1) {
+                progress = tween.number - Math.floor(tween.number)
+              } else {
+                progress = tween.number
+              }
+              if (that.listeners['onPageScroll'] && that.listeners['onPageScroll'].length > 0) {
+                that.listeners['onPageScroll'].forEach(listener => listener(swiper.realIndex, progress))
+              }
+            }).start();
+            function animate() {
+              if (Tween.update()) {
+                requestAnimationFrame(animate);
+              }
+            }
+            animate()
           }
         },
         transitionEnd: function (swiper) {
-          if (that.listeners['onPageScrollStateChange'] && that.listeners['onPageScrollStateChange'].length > 0) {
-            that.listeners['onPageScrollStateChange'].forEach(listener => listener(0))
-          }
-          transitionFlag = false;
-        },
-        sliderMove: function(swiper,event){
-          if(!transitionFlag){
-            transitionFlag = true;
+          if (initSuccess) {
             if (that.listeners['onPageScrollStateChange'] && that.listeners['onPageScrollStateChange'].length > 0) {
-              that.listeners['onPageScrollStateChange'].forEach(listener => listener(1))
+              that.listeners['onPageScrollStateChange'].forEach(listener => listener(0))
+            }
+            transitionFlag = false;
+          }
+        },
+        sliderMove: function (swiper, event) {
+          if (initSuccess) {
+            that.tween && Tween.remove(that.tween);
+            if (!transitionFlag) {
+              transitionFlag = true;
+              if (that.listeners['onPageScrollStateChange'] && that.listeners['onPageScrollStateChange'].length > 0) {
+                that.listeners['onPageScrollStateChange'].forEach(listener => listener(1))
+              }
             }
           }
-        }, 
+        },
+        touchEnd: function (swiper, event) {
+          if (initSuccess) {
+            let activeProgress
+            if (swiper.slides[swiper.activeIndex].progress >= 0) {
+              activeProgress = swiper.slides[swiper.activeIndex].progress
+            } else {
+              activeProgress = 1 + swiper.slides[swiper.activeIndex].progress
+            }
+            activeProgress !== 0 && (that.activeProgress = activeProgress)
+          }
+        },
+        progress: function (swiper, progress) {
+          if (initSuccess) {
+            let activeProgress
+            if (swiper.slides.length <= 0) {
+              return;
+            }
+            if (swiper.slides[swiper.activeIndex].progress >= 0) {
+              activeProgress = swiper.slides[swiper.activeIndex].progress
+            } else {
+              activeProgress = 1 + swiper.slides[swiper.activeIndex].progress
+            }
+            if (!/^-?\d+$/.test(activeProgress)) {
+              if (that.listeners['onPageScroll'] && that.listeners['onPageScroll'].length > 0) {
+                that.listeners['onPageScroll'].forEach(listener => listener(swiper.realIndex, activeProgress))
+              }
+            }
+            that.endProgress = activeProgress
+          }
+        },
       },
     })
+    initSuccess = true
   }
 
-  // swiperRuning(){
-  //   if(this.swiper) {
-  //     console.log(this.swiper.getTranslate(),this.swiper.realIndex)
-  //     this.swiperFrame = window.requestAnimationFrame(this.swiperRuning.bind(this))
-  //   }
-  // }
   protected createNode() {
     this.node = document.createElement('div')
   }
@@ -179,7 +250,8 @@ export class ViewPager extends View {
   }
 
   set style(_style: ViewPagerStyle) {
-    this._style = Object.assign(this._style, _style)
+    let standardStyle = styleTransformer.transformStyle(_style);
+    this._style = Object.assign(this._style, standardStyle)
   }
   get data() {
     return this._data
@@ -188,15 +260,6 @@ export class ViewPager extends View {
     this._data.length = _data.length
   }
 
-  // onPageChange!: (current: number, total: number) => void
-
-  // onItemClick!: (position: number) => void
-
-  // onItemView!: (position: number, view: View) => View
-
-  // onPageScrollStateChange!: (state: number) => void
-
-  // onPageScroll!: (position: number,percent: number) => void
   onItemView(callback) {
     if (!this.listeners['onItemView']) {
       this.listeners['onItemView'] = []
@@ -204,21 +267,18 @@ export class ViewPager extends View {
     this.listeners['onItemView'].push(callback)
   }
   onPageScroll(callback: any) {
-    // callback()
     if (!this.listeners['onPageScroll']) {
       this.listeners['onPageScroll'] = []
     }
     this.listeners['onPageScroll'].push(callback)
   }
   onPageScrollStateChange(callback: any) {
-    // callback()
     if (!this.listeners['onPageScrollStateChange']) {
       this.listeners['onPageScrollStateChange'] = []
     }
     this.listeners['onPageScrollStateChange'].push(callback)
   }
   onPageChange(callback: any) {
-    // callback()
     if (!this.listeners['onPageChange']) {
       this.listeners['onPageChange'] = []
     }
@@ -226,7 +286,6 @@ export class ViewPager extends View {
   }
 
   onItemClick(callback: any) {
-    // callback()
     if (!this.listeners['onItemClick']) {
       this.listeners['onItemClick'] = []
     }
@@ -234,31 +293,6 @@ export class ViewPager extends View {
   }
 
   setCurrentItem(position: number) {
-    this.style.canLoop?this.swiper.slideToLoop(position):this.swiper.slideTo(position)
-  }
-
-  setItemViewsArray(itemViewsInfo: any) {
-    let { flag, components } = itemViewsInfo
-    let hasExist = false
-    this.itemViewsArray.forEach(element => {
-      if (element.flag === flag) {
-        hasExist = true
-        element.components = components
-      }
-    })
-    if (!hasExist) {
-      this.itemViewsArray.push(itemViewsInfo)
-    }
-    this.updateItemViews()
-  }
-
-  updateItemViews() {
-    let itemViews: any[] = []
-    this.itemViewsArray.forEach(element => {
-      itemViews = itemViews.concat(element.components)
-    })
-    this.itemViews = itemViews
-    // @ts-ignore
-    this.data = new Array[this.itemViews.length]()
+    this.style.canLoop ? this.swiper.slideToLoop(position) : this.swiper.slideTo(position)
   }
 }
