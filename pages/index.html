@@ -10,40 +10,26 @@
 </head>
 
 <body>
+  <script src="https://unpkg.com/vue@next"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@dokit/web/dist/dokit.js" type="text/javascript" charset="utf-8"></script>
   <script>
-    (function () {
-      function resetRemUnit() {
-        var PC_W = 750;
-        var docEl = window.document.documentElement;
-        var width = docEl.getBoundingClientRect().width || 375;
-
-        if (!(/Android|webOS|iPhone|iPad|iPod|BlackBerry/i).test(navigator.userAgent)) {
-          width = width < PC_W ? width : PC_W;
-          docEl.className += ' ispc-html';
-        }
-
-        var f = width / 750;
-        docEl.style.fontSize = f + 'px';
-
-        var d = window.document.createElement('div');
-        d.style.width = '1rem';
-        d.style.display = "none";
-        var head = window.document.getElementsByTagName('head')[0];
-        head.appendChild(d);
-        var realf = parseFloat(window.getComputedStyle(d, null).getPropertyValue('width'));
-
-        if (f !== realf) {
-          docEl.style.fontSize = f * (f / realf) + 'px';
-        }
-      }
-      resetRemUnit();
-      window.addEventListener('resize', resetRemUnit);
-    })();
+    ! function (n) {
+      var e = n.document,
+        t = e.documentElement,
+        i = 750,
+        d = i ,
+        o = "orientationchange" in n ? "orientationchange" : "resize",
+        a = function () {
+          var n = t.clientWidth;
+          n > 750 && (n = 750);
+          t.style.fontSize = n / d + "px"
+        };
+      e.addEventListener && (n.addEventListener(o, a, !1), e.addEventListener("DOMContentLoaded", a, !1))
+    }(window);
   </script>
   <script src={{jsPath}}></script>
-  <!-- <script src="http://172.23.165.103:8000/component-button.js"></script> -->
-  {{each injectJsUrls}}
-    <script src="{{$value}}"></script>
+  {{each newInjectJsUrls}}
+  <script src="{{$value}}"></script>
   {{/each}}
 </body>
 

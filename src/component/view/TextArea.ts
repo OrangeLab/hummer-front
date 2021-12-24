@@ -36,7 +36,22 @@ export class TextArea extends Input {
       }
     })
   }
+  get focused() {
+    return document.activeElement === this.node
+  }
 
+  set focused(focused: boolean) {
+    console.log(focused)
+    if (focused) {
+      this.node.focus()
+    } else {
+      this.node.blur()
+    }
+  }
+  
+  protected defaultStyle() {
+    this.node.classList.add('hm-default-textarea')
+  }
   protected createNode() {
     this.node = document.createElement('textarea')
   }

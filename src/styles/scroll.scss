@@ -1,3 +1,9 @@
 .hm-default-vertical {
-    overflow-y: scroll;
+    overflow: hidden;
+    flex-direction: column;
+}
+.hm-default-horizontal{
+    overflow: hidden;
+    display: flex;
+    flex-direction: row !important;
 }

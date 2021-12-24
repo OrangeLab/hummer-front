@@ -3,19 +3,41 @@
 @import "text";
 @import "image";
 @import "./scroll";
+@import "./swiper";
+
+html {
+  width: 100%;
+  height: 100%;
+}
+
 body {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
+  width: 100%;
+  height: 100%;
+
+  div,
+  button,
+  input,
+  textarea,
+  span,
+  p,
+  image,
+  view,
+  canvas,
+  text {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-size: 32rem;
+    border: none;
+    border-width: 0;
+    display: flex;
+    flex-shrink: 0;
+  }
 }
-div, button, input, textarea, span,p, image, view, text{
-  padding: 0;
-  margin: 0;
-  box-sizing: border-box;
-  font-size: 16px;
-  border: none;
-  border-width: 0;
-}
+
 button {
   overflow: hidden;
   text-overflow: ellipsis;
@@ -23,29 +45,180 @@ button {
   outline: none;
   background-color: #ffffff;
 }
+
 .hm-default {
   display: flex;
   position: relative;
   flex-direction: column;
   border-style: solid;
 }
+
 .hm-default-inline {
   display: inline;
   position: relative;
   text-align: center;
 }
 
-.hm-default-view{
+.hm-default-textarea {
+  display: inline;
+  position: relative;
+  resize: none;
+}
+
+.hm-default-view {
   display: flex;
   flex-direction: column;
   position: relative;
   border-style: solid;
 }
-.hm-default-button{
+
+.hm-default-dialog {
+  display: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  z-index: 2000;
+  height: 100%;
+  width: 100%;
+
+  .hm-default-dialog-mask {
+    height: 100%;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.7);
+    position: absolute;
+    top: 0;
+    left: 0;
+  }
+}
+
+.hm-default-alert-box {
+  width: 80%;
+  background-color: #fff;
+  border-radius: 2rem;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate3d(-50%, -50%, 0);
+
+  .hm-default-alert-msg {
+    padding: 20rem 30rem 10rem;
+    font-size: 39rem;
+  }
+
+  .hm-default-alert-btn {
+    padding: 10rem 20rem 20rem;
+    flex-direction: row;
+    align-items: center;
+    justify-content: end;
+  }
+
+  .hm-default-confirm-view-okBtn {
+    color: #000;
+  }
+
+  .hm-default-confirm-view-cancelBtn {
+    color: #ccc;
+    margin-right: 30rem;
+  }
+
+  .hm-default-confirm-view-text {
+    padding: 0rem 30rem 20rem;
+    color: #000;
+  }
+}
+
+.hm-default-loading {
+  padding: 20rem;
+  flex-direction: row;
+  align-items: center;
+  color: #fff;
+  border-radius: 2rem;
+  background-color: rgba(0, 0, 0, 0.8);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate3d(-50%, -50%, 0);
+
+  .hm-default-loading-icon {
+    margin-right: 10rem;
+    width: 50rem;
+    height: 50rem;
+    animation: loadingRotate 1.5s linear infinite;
+  }
+}
+
+.hm-default-toast {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  display: none;
+  opacity: 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  // width: 88px;
+  // max-width: 70%;
+  // min-height: 88px;
+  padding: 16px;
+  color: #fff;
+  font-size: 14px;
+  line-height: 20px;
+  white-space: pre-wrap;
+  text-align: center;
+  word-break: break-all;
+  background-color: rgba(0, 0, 0, 0.7);
+  border-radius: 8px;
+  -webkit-transform: translate3d(-50%, -50%, 0);
+  transform: translate3d(-50%, -50%, 0);
+  transition: opacity 0.5s;
+}
+
+.hm-default-button {
   display: flex;
   justify-content: center;
   align-items: center;
 }
+
 .hm-high-light {
   border: 1px solid red;
+}
+
+.hm-default-navbar {
+  width: 100%;
+  height: 46px;
+  position: relative;
+  box-shadow: 0 5px 7px #ebedf0;
+  align-items: center;
+  justify-content: center;
+  // margin-bottom: 10px;
+  background-color: #fff;
+
+  .hm-default-nav-title {
+    font-weight: 600;
+    font-size: 17px;
+    text-transform: capitalize;
+  }
+
+  .hm-default-nav-back {
+    position: absolute;
+    top: 50%;
+    left: 16px;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    background: url('https://pt-starimg.didistatic.com/static/starimg/img/jdclrxCZEQ1638949475265.png') no-repeat center center;
+    background-size: 100% 100%;
+  }
+}
+
+@keyframes loadingRotate {
+  0% {
+    transform: rotate(0deg);
+  }
+
+  100% {
+    transform: rotate(360deg);
+  }
 }
