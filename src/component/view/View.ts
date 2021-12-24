@@ -211,7 +211,6 @@ export class View {
         navBar.appendChild(navBarTitle)
         this.node.childNodes[0].style.flex = 1
         this.node.insertBefore(navBar.node, this.node.childNodes[0])
-        this.style.overflow = 'hidden'
       }
     })
   }
