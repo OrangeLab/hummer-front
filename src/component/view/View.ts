@@ -400,6 +400,7 @@ export class View {
       if (key === 'longPress') {
         const press = (e: any) => {
           if (!this.enabled) return
+          if ((window as any).openElementMap) return
           const ev = new LongPressEvent()
           ev.target = this
           ev.timestamp = e.timeStamp
@@ -408,6 +409,7 @@ export class View {
         }
         const pressup = (e: any) => {
           if (!this.enabled) return
+          if ((window as any).openElementMap) return
           const ev = new LongPressEvent()
           ev.target = this
           ev.timestamp = e.timeStamp
@@ -422,6 +424,7 @@ export class View {
         let oldDeltaX = 0, oldDeltaY = 0;
         const panstart = (e: any) => {
           if (!this.enabled) return
+          if ((window as any).openElementMap) return
           const ev = new PanEvent()
           ev.target = this
           ev.timestamp = e.timeStamp
@@ -433,6 +436,7 @@ export class View {
         }
         const panmove = (e: any) => {
           if (!this.enabled) return
+          if ((window as any).openElementMap) return
           const ev = new PanEvent()
           ev.target = this
           ev.timestamp = e.timeStamp
@@ -444,6 +448,7 @@ export class View {
         }
         const panend = (e: any) => {
           if (!this.enabled) return
+          if ((window as any).openElementMap) return
           const ev = new PanEvent()
           ev.target = this
           ev.timestamp = e.timeStamp
@@ -453,6 +458,7 @@ export class View {
         }
         const pancancel = (e: any) => {
           if (!this.enabled) return
+          if ((window as any).openElementMap) return
           const ev = new PanEvent()
           ev.target = this
           ev.timestamp = e.timeStamp
@@ -479,6 +485,7 @@ export class View {
       } else if (key === 'pinch') {
         const pinchstart = (e: any) => {
           if (!this.enabled) return
+          if ((window as any).openElementMap) return
           const ev = new PinchEvent()
           ev.target = this
           ev.timestamp = e.timeStamp
@@ -488,6 +495,7 @@ export class View {
         }
         const pinchmove = (e: any) => {
           if (!this.enabled) return
+          if ((window as any).openElementMap) return
           const ev = new PinchEvent()
           ev.target = this
           ev.timestamp = e.timeStamp
@@ -497,6 +505,7 @@ export class View {
         }
         const pinchend = (e: any) => {
           if (!this.enabled) return
+          if ((window as any).openElementMap) return
           const ev = new PinchEvent()
           ev.target = this
           ev.timestamp = e.timeStamp
@@ -506,6 +515,7 @@ export class View {
         }
         const pinchcancel = (e: any) => {
           if (!this.enabled) return
+          if ((window as any).openElementMap) return
 
           const ev = new PinchEvent()
           ev.target = this
@@ -530,6 +540,7 @@ export class View {
       } else if (key === 'swipe') {
         const swipeleft = (e: any) => {
           if (!this.enabled) return
+          if ((window as any).openElementMap) return
 
           const ev = new SwipeEvent()
           ev.target = this
@@ -540,6 +551,7 @@ export class View {
         }
         const swiperight = (e: any) => {
           if (!this.enabled) return
+          if ((window as any).openElementMap) return
 
           const ev = new SwipeEvent()
           ev.target = this
@@ -550,6 +562,7 @@ export class View {
         }
         const swipeup = (e: any) => {
           if (!this.enabled) return
+          if ((window as any).openElementMap) return
 
           const ev = new SwipeEvent()
           ev.target = this
@@ -560,6 +573,7 @@ export class View {
         }
         const swipedown = (e: any) => {
           if (!this.enabled) return
+          if ((window as any).openElementMap) return
 
           const ev = new SwipeEvent()
           ev.target = this
@@ -583,7 +597,7 @@ export class View {
       } else if (key === 'tap') {
         const tap = (event: any) => {
           if (!this.enabled) return
-
+          if ((window as any).openElementMap) return
           const ev = new TapEvent()
           ev.target = this
           ev.position = {
@@ -642,6 +656,7 @@ export class View {
           e.stopPropagation && e.stopPropagation();
           e.preventDefault && e.preventDefault();
           if (!this.enabled) return
+          if ((window as any).openElementMap) return
           const ev = new TouchEvent()
           ev.target = this
           ev.timestamp = e.timeStamp
@@ -785,7 +800,19 @@ export class View {
   // }
 
   getRect(callback: Function) {
-    callback({})
+    let rect = {
+      width: this.node.offsetWidth,
+      height: this.node.offsetHeight,
+      left: this.node.offsetLeft,
+      right: this.node.parentNode.offsetWidth - this.node.offsetLeft -this.node.offsetWidth,
+      top: this.node.offsetTop,
+      bottom: this.node.parentNode.offsetHeight - this.node.offsetTop -this.node.offsetHeight,
+      windowLeft: this.node.getBoundingClientRect().left,
+      windowRight: this.node.getBoundingClientRect().right,
+      windowTop: this.node.getBoundingClientRect().top,
+      windowBottom: this.node.getBoundingClientRect().bottom
+    }
+    callback(rect)
   }
 
   dbg_highlight(isHighlight: Boolean) {

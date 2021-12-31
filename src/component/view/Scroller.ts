@@ -30,7 +30,7 @@ export class Scroller extends View {
   constructor() {
     super()
     this.wrapper = new View()
-    this.wrapper.node.classList.add('hm-list-content')
+    this.wrapper.node.classList.add('hm-scroller-content')
     this.node.appendChild(this.wrapper.node)
     // @ts-ignore
     this._style = new Proxy(this._style, {
