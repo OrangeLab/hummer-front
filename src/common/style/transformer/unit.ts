@@ -3,13 +3,13 @@
  * hm ==> px
  * @param style 待处理的Style
  */
-import { makeMapByArrOfKebab,formatUnit } from "../../utils"
+import { makeMapByArrOfKebab, formatUnit } from "../../utils"
 
 // 待转换单位的属性列表
 export const unitAttrs = [
   'font-size', 'placeholder-font-size', 'transform',
-  'flex-basis',
-  'width', 'max-width', 'min-width', 'height', 'max-height', 'min-height','line-height',
+  'flex-basis','shadow',
+  'width', 'max-width', 'min-width', 'height', 'max-height', 'min-height', 'line-height',
   'padding', 'padding-left', 'padding-right', 'padding-bottom', 'padding-top',
   'margin', 'margin-left', 'margin-right', 'margin-bottom', 'margin-top',
   'left', 'right', 'top', 'bottom',
@@ -22,9 +22,22 @@ export function transformUnit(style: Record<string, string>) {
     if (key === 'transitionDuration') {
       style[key] = `${style[key]}s`
     }
+    // console.log(key + ':' + style[key]);
+    if ((style[key] + '').indexOf('linear-gradient') !== -1) {
+      style['backgroundImage'] = style[key].trim().replaceAll(/\s+/g, ",");
+      style[key] = 'transparent'
+    }
     if (isNeedUnitTrasform(key)) {
-      let value = transformUnitValue(style[key])
-      style[key] = value
+      let value
+      if (key.indexOf('shadow') !== -1) {
+        value = style[key].trim().replaceAll(/[0-9](.*?)[\s+,*]+/g, function (word) {
+          return transformUnitValue(word.trim()) + ' '
+        });
+        style['boxShadow'] = value
+      } else {
+        value = transformUnitValue(style[key])
+        style[key] = value
+      }
     }
   })
   return style

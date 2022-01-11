@@ -1,6 +1,5 @@
 import { View, ViewStyle, SIZE_STYLE } from './View'
-import { formatUnit } from '../../common/utils'
-
+import { styleTransformer } from '../../common/style'
 export const INPUT_SIZE_STYLE: Array<any> = ['fontSize'].concat(SIZE_STYLE)
 export interface InputStyle extends ViewStyle {
   type?: 'default' | 'number' | 'tel' | 'email' | 'password'
@@ -50,13 +49,7 @@ export class Input extends View {
         },
         set: (target, key, value) => {
           // 设置style
-          if (SIZE_STYLE.includes(key)) {
-            // @ts-ignore
-            target[key] = formatUnit(value)
-          } else {
-            // @ts-ignore
-            target[key] = value
-          }
+          target[key] = value
           switch (key) {
             case 'type':
               this.node.type!=='textarea'&&(this.node.type = value)
@@ -84,11 +77,7 @@ export class Input extends View {
             case 'color':
             case 'fontSize':
             default:
-              if (INPUT_SIZE_STYLE.includes(key)) {
-                this.node.style[key] = formatUnit(value)
-              } else {
-                this.node.style[key] = value
-              }
+              this.node.style[key] = value
           }
           return true
         }
@@ -111,7 +100,7 @@ export class Input extends View {
       const item: any = document.styleSheets.item(0)
       if (item.insertRule) {
         item.insertRule(
-          `.${this._randomPlaceholderClass}::placeholder {font-size: ${formatUnit(fontSize)}; color: ${color};}`,
+          `.${this._randomPlaceholderClass}::placeholder {font-size: ${fontSize}; color: ${color};}`,
           item.cssRules.length
         )
       }
@@ -155,7 +144,9 @@ export class Input extends View {
   }
 
   set style(_style: InputStyle) {
-    this._style = Object.assign(this._style, _style)
+    let deepStyle = JSON.parse(JSON.stringify(_style))
+    let standardStyle = styleTransformer.transformStyle(deepStyle);
+    this._style = Object.assign(this._style, standardStyle)
   }
 
   clear() {

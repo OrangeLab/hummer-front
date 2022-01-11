@@ -161,6 +161,9 @@ export class View {
   layout!: () => void
 
   constructor(public viewID?: string) {
+    let backgroundUrl
+    let urlReg = /url\("?'?.((?!\,).)*"?'?\)/g
+    let ColorReg = /linear-gradient\([^(]*(\([^)]*\)[^(]*)*[^)]*\)/g
     this.createNode()
     this._enabled = true
     this.subViews = new Set<View>()
@@ -174,7 +177,39 @@ export class View {
           return target[key] || this.node.style[key]
         },
         set: (target, key, value) => {
-          this.node.style[key] = value
+          switch (key) {
+            case 'flexShrink':
+              if(value === 1){
+                this.node.style['overflow'] = 'hidden'
+              }
+              this.node.style[key] = value
+              break;
+            case 'backgroundColor':
+              backgroundUrl = this.node.style['backgroundImage'].match(urlReg)?.[0] || 'none'
+              this.node.style['backgroundImage'] = backgroundUrl
+              this.node.style[key] = value
+              break;
+            case 'backgroundImage':
+              let newBackgroundUrl = value.match(urlReg)
+              let newBackgroundColor = value.match(ColorReg)
+              let backgroundColor = this.node.style['backgroundImage'].match(ColorReg)
+              backgroundUrl = this.node.style['backgroundImage'].match(urlReg)
+              if (backgroundUrl && newBackgroundUrl) {
+                this.node.style['backgroundImage'].replaceAll(urlReg, newBackgroundUrl[0])
+              }
+              if (newBackgroundColor && backgroundColor) {
+                this.node.style['backgroundImage'].replaceAll(ColorReg, newBackgroundColor[0])
+              }
+              if (!backgroundUrl && !backgroundColor) {
+                this.node.style['backgroundImage'] = value
+              } else {
+                this.node.style['backgroundImage'] = `${this.node.style['backgroundImage']},${value}`
+              }
+              break;
+            default:
+              this.node.style[key] = value
+              break;
+          }
           return true
         }
       }
@@ -182,7 +217,7 @@ export class View {
     this.defaultStyle()
     this.initialize()
     window.addEventListener('render-ready', () => {
-      this.formatBasicAnimation()
+      // this.formatBasicAnimation()
       this?.onCreate && this.onCreate()
       this?.onAppear && this.onAppear()
       if (this?.onAppear || this?.onDisappear) {
@@ -314,7 +349,8 @@ export class View {
   }
 
   set style(_style: ViewStyle) {
-    let standardStyle = styleTransformer.transformStyle(_style);
+    let deepStyle = JSON.parse(JSON.stringify(_style))
+    let standardStyle = styleTransformer.transformStyle(deepStyle)
     this._style = Object.assign(this._style, standardStyle)
   }
 
@@ -583,6 +619,9 @@ export class View {
           this.listeners[key].forEach(listener => listener(ev))
         }
         const hammer = new Hammer(this.node)
+        hammer.get('swipe').set({
+          direction: Hammer.DIRECTION_ALL
+        });
         hammer.on('swipeleft', swipeleft)
         hammer.on('swiperight', swiperight)
         hammer.on('swipeup', swipeup)
@@ -769,6 +808,7 @@ export class View {
       let a = {}
       a[`${key}`] = animation
       this.basicAnimationArray.push(a);
+      this.formatBasicAnimation();
     } else if (animation instanceof KeyframeAnimation) {
       // 帧动画
       const { keyframes, options } = this.getKeyframeAnimationOptions(animation)
@@ -804,9 +844,9 @@ export class View {
       width: this.node.offsetWidth,
       height: this.node.offsetHeight,
       left: this.node.offsetLeft,
-      right: this.node.parentNode.offsetWidth - this.node.offsetLeft -this.node.offsetWidth,
+      right: this.node.parentNode.offsetWidth - this.node.offsetLeft - this.node.offsetWidth,
       top: this.node.offsetTop,
-      bottom: this.node.parentNode.offsetHeight - this.node.offsetTop -this.node.offsetHeight,
+      bottom: this.node.parentNode.offsetHeight - this.node.offsetTop - this.node.offsetHeight,
       windowLeft: this.node.getBoundingClientRect().left,
       windowRight: this.node.getBoundingClientRect().right,
       windowTop: this.node.getBoundingClientRect().top,

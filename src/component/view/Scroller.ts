@@ -3,12 +3,11 @@ import { View, ViewStyle } from './View'
 import { ScrollEvent, ScrollState } from '../event/ScrollEvent'
 import { EventListener } from '../event/Event'
 import { nodeObserver } from '../../common/utils'
-import { formatUnit } from '../../common/utils'
 
 export class Scroller extends View {
 
-  refreshView!: View
-  loadMoreView!: View
+  refreshView?: View
+  loadMoreView?: View
   _showScrollBar: boolean = false // 滑动时是否显示滚动条
   _bounces: boolean = true // 滑动到 边缘时是否有回弹效果
   isMoreData: boolean = true
@@ -32,24 +31,6 @@ export class Scroller extends View {
     this.wrapper = new View()
     this.wrapper.node.classList.add('hm-scroller-content')
     this.node.appendChild(this.wrapper.node)
-    // @ts-ignore
-    this._style = new Proxy(this._style, {
-      get: (target, key) => {
-        // @ts-ignore
-        return target[key] || this.node.style[key]
-      },
-      set: (target, key, value) => {
-        // 设置style
-        // @ts-ignore
-        target[key] = value
-        // this.node.style[key] = value
-        switch (key) {
-          default:
-            this.node.style[key] = formatUnit(value)
-        }
-        return true
-      }
-    })
     // 监听元素是否渲染
     nodeObserver(this.node, () => {
       this.refreshView && (this.refreshView.style = {
@@ -58,19 +39,14 @@ export class Scroller extends View {
         width: '100%',
       })
       if (this.bscroll) {
-        this.refreshView && this.bscroll.openPullDown({
+        this.refreshView && this.bscroll?.openPullDown({
           stop: this.refreshView.node.offsetHeight
         });
         this.bscroll.refresh()
+      } else {
+        this.refresh()
       }
     })
-  }
-  get style() {
-    return this._style
-  }
-
-  set style(_style: ViewStyle) {
-    this._style = Object.assign(this._style, _style)
   }
 
   get showScrollBar() {
@@ -98,10 +74,7 @@ export class Scroller extends View {
       this.refresh()
     }
   }
-  onMounted() {
-    this.refresh()
-  }
-  onDestoryed(){
+  onDestoryed() {
     this.bscroll.destroy()
   }
 
@@ -113,6 +86,14 @@ export class Scroller extends View {
   removeChild(subview: any) {
     this.wrapper.node.removeChild(subview.node)
     this.bscroll && this.bscroll.refresh()
+  }
+  removeAll() {
+    for (let index = this.wrapper.node.childNodes.length - 1; index >= 0; index--) {
+      const element = this.wrapper.node.childNodes[index];
+      if (element !== this.refreshView.node && element !== this.loadMoreView.node) {
+        this.wrapper.node.removeChild(element)
+      }
+    }
   }
   insertBefore(subview: any, existingView: View) {
     this.wrapper.node.insertBefore(subview.node, existingView.node)
@@ -138,9 +119,14 @@ export class Scroller extends View {
     }
     // add loadmore view
     if (this.loadMoreView) {
+      this.loadMoreView.style = {
+        position: 'absolute',
+        bottom: 0,
+        transform: 'translateY(100%) translateZ(0)',
+        width: '100%',
+      }
       this.wrapper.node.appendChild(this.loadMoreView.node)
     }
-
     if (!this.bscroll) {
       this.bscroll = new BScroll(this.node, {
         bounce: this._bounces,
@@ -157,6 +143,8 @@ export class Scroller extends View {
         tap: 'tap',
         probeType: 3,
         eventPassthrough: 'horizontal',
+        observeImage: true,
+        observeDOM: true,
       })
       // 上拉加载更多
       if (this.loadMoreView) {
@@ -177,12 +165,12 @@ export class Scroller extends View {
           this.onRefresh && this.onRefresh(3)
         })
         this.bscroll.on('scroll', (e: any) => {
-          if (e.y > 0 && e.y<this.bscroll?.plugins?.pullDownRefresh?.options?.threshold) {
+          if (e.y > 0 && e.y < this.bscroll?.plugins?.pullDownRefresh?.options?.threshold) {
             if (pullflag === 'none') {
               this.onRefresh && this.onRefresh(1)
             }
             pullflag = 'center'
-          } else if (e.y <= 0 ) {
+          } else if (e.y <= 0) {
             pullflag = 'none'
           }
         })
@@ -399,25 +387,15 @@ export class Scroller extends View {
   }
   stopPullRefresh() {
     this.isMoreData = true
-    this.bscroll.finishPullUp()
-    this.loadMoreView.style = {
-      position: 'static',
-      transform: 'none',
-    }
-    this.bscroll && this.bscroll.finishPullDown()
+    this.bscroll?.finishPullUp()
+    this.bscroll && this.bscroll?.finishPullDown()
     this.onRefresh && this.onRefresh(0)
-    this.bscroll && this.bscroll.refresh()
+    this.bscroll && this.bscroll?.refresh()
   }
   stopLoadMore(enable: boolean) {
     if (this.bscroll) {
       if (!enable) {
         this.isMoreData = false
-        this.loadMoreView.style = {
-          position: 'absolute',
-          bottom: 0,
-          transform: 'translateY(100%) translateZ(0)',
-          width: '100%',
-        }
         this.bscroll.finishPullUp()
       } else {
         this.bscroll.finishPullUp()

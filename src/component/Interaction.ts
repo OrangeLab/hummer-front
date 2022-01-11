@@ -1,6 +1,6 @@
 import { View } from './view/View'
 import { Image } from './view/Image'
-export class Toast {
+class ToastThis {
   customView?: View
   toastTimer?:any
   constructor() {
@@ -145,4 +145,5 @@ export class Dialog {
   }
 }
 globalThis.Dialog = Dialog
-globalThis.Toast = new Toast()
+globalThis.Toast = new ToastThis()
+export const Toast = new ToastThis()

@@ -12,7 +12,7 @@ export const Navigator = {
     let cloneOptions = JSON.parse(JSON.stringify(options))
     let navbar = getQueryVariable('navBar',url);
     if (cloneOptions.url.match(/^(hummer:\/\/||http||.\/).*.js$/g)) {
-      cloneOptions.url = `http://${window.location.host}${cloneOptions.url.match(/\/.[a-zA-Z]*.js$/g)[0].split('.')[0]}`
+      cloneOptions.url = `http://${window.location.host}${cloneOptions.url.match(/\/.*.js$/g)[0].split('.')[0]}`
       url = `${cloneOptions.url}?pageInfo=${encodeURIComponent(JSON.stringify(cloneOptions))}`
     } else if (cloneOptions.url.match(/^http.*/g)) {
       url = cloneOptions.url
@@ -25,7 +25,7 @@ export const Navigator = {
     } else {
       location.assign(url)
     }
-    callback();
+    callback&&callback();
   },
   popPage: (options?: any) => {
     history.go(-1);

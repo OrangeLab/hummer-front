@@ -5,6 +5,7 @@ import { EventListener } from '../event/Event'
 // import { Hummer } from '../../base/Global'
 import { formatUnit } from '../../common/utils'
 import { nodeObserver } from '../../common/utils'
+import { styleTransformer } from '../../common/style'
 export interface ListStyle extends ViewStyle {
   mode?: 'list' | 'grid' | 'waterfall'
   scrollDirection?: 'vertical' | 'horizontal'
@@ -113,7 +114,7 @@ export class List extends View {
             this.recyclerView.style['paddingBottom'] = formatUnit(value)
             break
           default:
-            this.node.style[key] = formatUnit(value)
+            this.node.style[key] = styleTransformer.transformStyle(value)
             break
         }
         return true
@@ -176,7 +177,8 @@ export class List extends View {
   }
 
   set style(_style: ListStyle) {
-    this._style = Object.assign(this._style, _style)
+    let deepStyle = JSON.parse(JSON.stringify(_style))
+    this._style = Object.assign(this._style, deepStyle)
   }
 
   refresh(count: number) {
@@ -240,10 +242,6 @@ export class List extends View {
   stopPullRefresh() {
     this.isMoreData = true
     this.bscroll.finishPullUp()
-    this.loadMoreView.style = {
-      position: 'static',
-      transform: 'none',
-    }
     this.bscroll && this.bscroll.finishPullDown()
     this.onRefresh && this.onRefresh(0)
     this.bscroll && this.bscroll.refresh()
@@ -257,13 +255,6 @@ export class List extends View {
     if (this.bscroll) {
       if (!enable) {
         this.isMoreData = false
-        this.loadMoreView.style = {
-          position: 'absolute',
-          bottom: 0,
-          left: 0,
-          transform: 'translateY(100%) translateZ(0)',
-          width: '100%',
-        }
         this.bscroll.finishPullUp()
       } else {
         this.bscroll.finishPullUp()
@@ -349,6 +340,7 @@ export class List extends View {
       }
       //如果是水平滚动
       if (this.style.scrollDirection === 'horizontal') {
+        row.style.flexDirection = 'row'
         this.recyclerView.node.classList.add('horizontal')
         this.wrapper.node.classList.add('hm-list-content-horizontal')
         this.node.style.width = '100%'
@@ -394,7 +386,7 @@ export class List extends View {
         row = new View()
         row.node.classList.add('hm-list-row')
         if (this.style.lineSpacing && index > 0) {
-          row.style.marginTop = `${this.style.lineSpacing}`
+          row.style.marginTop = formatUnit(`${this.style.lineSpacing}`)
         }
         this._gridRows.push(row)
         row.appendChild(col)
@@ -452,7 +444,6 @@ export class List extends View {
       } else {
         row = this._gridRows[Math.floor(index / column)]
         if (this.style.itemSpacing) {
-          console.log(this.style.itemSpacing)
           col.style.marginLeft = formatUnit(this.style.itemSpacing)
         }
         row.appendChild(col)
@@ -529,6 +520,12 @@ export class List extends View {
     }
     // 添加 loadmore view
     if (this.loadMoreView) {
+      this.loadMoreView.style = {
+        position: 'absolute',
+        bottom: 0,
+        transform: 'translateY(100%) translateZ(0)',
+        width: '100%',
+      }
       this.wrapper.node.appendChild(this.loadMoreView.node)
     }
     if (!this.bscroll) {

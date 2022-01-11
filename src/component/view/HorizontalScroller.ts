@@ -3,7 +3,6 @@ import BScroll from 'better-scroll'
 import { ScrollEvent, ScrollState } from '../event/ScrollEvent'
 import { EventListener } from '../event/Event'
 import { nodeObserver } from '../../common/utils'
-import { formatUnit } from '../../common/utils'
 export class HorizontalScroller extends View {
   _bounces: boolean = true // 滑动到 边缘时是否有回弹效果
   _showScrollBar: boolean = false // 滑动时是否显示滚动条
@@ -14,37 +13,12 @@ export class HorizontalScroller extends View {
   constructor() {
     super()
     this.wrapper = document.createElement('span');
-    this.wrapper.classList.add('hm-default-horizontal')
+    this.wrapper.classList.add('hm-scroller-content')
     this.node.appendChild(this.wrapper)
-    // @ts-ignore
-    this._style = new Proxy(this._style, {
-      get: (target, key) => {
-        // @ts-ignore
-        return target[key] || this.node.style[key]
-      },
-      set: (target, key, value) => {
-        // 设置style
-        // @ts-ignore
-        target[key] = value
-        switch (key) {
-          default:
-            this.node.style[key] = formatUnit(value)
-        }
-        return true
-      }
-    })
     nodeObserver(this.node, () => {
       this.bscroll && this.bscroll.refresh();
     })
   }
-  get style() {
-    return this._style
-  }
-
-  set style(_style: ViewStyle) {
-    this._style = Object.assign(this._style, _style)
-  }
-
   get showScrollBar() {
     return this._showScrollBar
   }
@@ -121,6 +95,8 @@ export class HorizontalScroller extends View {
         tap: 'tap',
         probeType: 3,
         eventPassthrough: 'vertical',
+        observeImage: true,
+        observeDOM: true,
       })
       if (
         this.listeners['scroll'] &&
