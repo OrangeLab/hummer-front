@@ -815,7 +815,7 @@ export class View {
       const animate: Animation = this.node.animate(keyframes, options)
       this.animations[key] = animate
       animation.onstart && animation.onstart()
-      animation.onend && (animate.oncancel = animation.onend as any)
+      animation.onend && (animate.onfinish = animation.onend as any)
       animate.play()
     }
   }

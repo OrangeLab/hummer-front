@@ -18,7 +18,7 @@
     "comment": "npm run git -- 'commit-msg'  so you can push and update by a auto way",
     "git": "npm run build && git add . && git commit -m",
     "release": "node ./script/release.js",
-    "copy": "copyfiles -u 1 ./pages/index.html ./dist"
+    "copy": "copyfiles -u 1 './pages/index.html' './dist'"
   },
   "repository": {
     "type": "git",

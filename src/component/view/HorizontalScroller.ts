@@ -9,12 +9,36 @@ export class HorizontalScroller extends View {
   protected _style: ViewStyle
   // @ts-ignore
   private bscroll: BScroll
-  private wrapper: Element
+  private wrapper: HTMLElement
   constructor() {
     super()
     this.wrapper = document.createElement('span');
     this.wrapper.classList.add('hm-scroller-content')
     this.node.appendChild(this.wrapper)
+    this._style = new Proxy(
+      {},
+      {
+        get: (target, key) => {
+          return target[key] || this.node.style[key]
+        },
+        set: (target, key, value) => {
+          switch (key) {
+            case 'justifyContent':
+              this.node.style[key] = value
+              this.wrapper.style[key] = value
+              break;
+            case 'alignItems':
+              this.node.style[key] = value
+              this.wrapper.style[key] = value
+              break;
+            default:
+              this.node.style[key] = value
+              break;
+          }
+          return true
+        }
+      }
+    )
     nodeObserver(this.node, () => {
       this.bscroll && this.bscroll.refresh();
     })

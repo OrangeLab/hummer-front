@@ -42,7 +42,11 @@ export class BasicAnimation {
   onstart!: Function
   onend!: Function
   on(type: string, callback: Function) {
-    callback()
+    if(type === 'start' ){
+      this.onstart = callback
+    } else if(type === 'end'){
+      this.onend = callback
+    }
   }
 
   removeAnimation!: Function

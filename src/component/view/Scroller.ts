@@ -31,6 +31,30 @@ export class Scroller extends View {
     this.wrapper = new View()
     this.wrapper.node.classList.add('hm-scroller-content')
     this.node.appendChild(this.wrapper.node)
+    this._style = new Proxy(
+      {},
+      {
+        get: (target, key) => {
+          return target[key] || this.node.style[key]
+        },
+        set: (target, key, value) => {
+          switch (key) {
+            case 'justifyContent':
+              this.node.style[key] = value
+              this.wrapper.node.style[key] = value
+              break;
+            case 'alignItems':
+              this.node.style[key] = value
+              this.wrapper.node.style[key] = value
+              break;
+            default:
+              this.node.style[key] = value
+              break;
+          }
+          return true
+        }
+      }
+    )
     // 监听元素是否渲染
     nodeObserver(this.node, () => {
       this.refreshView && (this.refreshView.style = {
