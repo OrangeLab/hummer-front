@@ -31,7 +31,7 @@
   {{each newInjectJsUrls}}
   <script src="{{$value}}"></script>
   {{/each}}
-  <script>
+  <!-- <script>
     function loadJS(url, callback) {
       var script = document.createElement('script'),
         fn = callback || function () {};
@@ -54,7 +54,7 @@
       document.getElementsByTagName('head')[0].appendChild(script);
     }
     loadJS(`${window.location.pathname||'index'}.js`,function(){});
-  </script>
+  </script> -->
 </body>
 
 </html>
