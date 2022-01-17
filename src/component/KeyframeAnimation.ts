@@ -19,7 +19,11 @@ export class KeyframeAnimation {
   onend!: Function
   delay: number
   on(type: string, callback: Function) {
-    callback()
+    if(type === 'start' ){
+      this.onstart = callback
+    } else if(type === 'end'){
+      this.onend = callback
+    }
   }
 
   removeAnimation!: Function

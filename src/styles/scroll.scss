@@ -1,9 +1,21 @@
 .hm-default-vertical {
     overflow: hidden;
     flex-direction: column;
+    max-height: 100%;
+    max-width: 100%;
+    .hm-scroller-content{
+        min-height: 102%;
+        width: 100%;
+    }
 }
 .hm-default-horizontal{
     overflow: hidden;
     display: flex;
     flex-direction: row !important;
+    max-height: 100%;
+    max-width: 100%;
+    .hm-scroller-content{
+        min-width: 102%;
+        height: 100%;
+    }
 }

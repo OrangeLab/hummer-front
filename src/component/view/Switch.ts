@@ -1,6 +1,6 @@
 import { View, ViewStyle } from './View'
 import { SwitchEvent, SwitchEventListener } from '../event/SwitchEvent'
-import { formatUnit } from '../../common/utils'
+import { styleTransformer } from '../../common/style'
 
 export interface SwitchStyle extends ViewStyle {
   onColor?: string
@@ -58,13 +58,13 @@ export class Switch extends View {
             this.circle.style.backgroundColor = value
             break
           case 'height':
-            this.switchBtn.style[key] = formatUnit(value)
-            this.circle.style['height'] = formatUnit(value)
-            this.circle.style['width'] = formatUnit(value)
-            this.switchBtn.style['borderRadius'] = formatUnit(value)
+            this.switchBtn.style[key] = value
+            this.circle.style['height'] = value
+            this.circle.style['width'] = value
+            this.switchBtn.style['borderRadius'] = value
             break
           case 'width':
-            this.switchBtn.style[key] = formatUnit(value)
+            this.switchBtn.style[key] = value
             break
         }
         return true
@@ -87,7 +87,7 @@ export class Switch extends View {
   private bindEvents() {
     let dom = this.node
     let that = this
-    dom.addEventListener('click', function() {
+    dom.addEventListener('click', function () {
       let className = dom.className
       if (/hm-switch-checked/.test(className)) {
         that.checked = false
@@ -130,13 +130,13 @@ export class Switch extends View {
         this._style.onColor || 'rgb(19, 206, 102)'
       this.node.classList.add('hm-switch-checked')
     } else {
-      const width = +`${this._style.width}`.replace('px', '')
-      const circleWidth = +this.circle.style['width'].replace('px', '')
+      const width = this.node.offsetWidth
+      const circleWidth = this.circle.offsetWidth
       this.circle.style.right = width - circleWidth - 2 + 'px'
       this.switchBtn.style.borderColor =
-        this._style.offColor || 'rgb(255, 73, 73)'
+        this.style.offColor || 'rgb(255, 73, 73)'
       this.switchBtn.style.backgroundColor =
-        this._style.offColor || 'rgb(255, 73, 73)'
+        this.style.offColor || 'rgb(255, 73, 73)'
       this.node.classList.remove('hm-switch-checked')
     }
 
@@ -157,6 +157,8 @@ export class Switch extends View {
   }
 
   set style(_style: SwitchStyle) {
-    this._style = Object.assign(this._style, _style)
+    let deepStyle = JSON.parse(JSON.stringify(_style))
+    let standardStyle = styleTransformer.transformStyle(deepStyle);
+    this._style = Object.assign(this._style, standardStyle)
   }
 }

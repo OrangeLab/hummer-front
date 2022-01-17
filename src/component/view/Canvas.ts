@@ -1,5 +1,5 @@
 import { View, ViewStyle } from './View'
-import { formatPureNumberPxUnit, formatUnit } from '../../common/utils'
+import { formatWebPureNumberPxUnit, formatPureNumberPxUnit } from '../../common/utils'
 export interface CanvasStyle extends ViewStyle { }
 
 export class CanvasView extends View {
@@ -21,32 +21,23 @@ export class CanvasView extends View {
                 target[key] = value
                 switch (key) {
                     case 'width':
-                        this.node.style[key] = formatUnit(value)
+                        this.node.style[key] = value
                         if (value.indexOf('%') !== -1) {
                             console.error('canvas宽高不支持设置百分比')
                         }
-                        this.node.width = formatPureNumberPxUnit(value) * this.resolution
+                        this.node.width = formatWebPureNumberPxUnit(value) * this.resolution
                         break
                     case 'height':
-                        this.node.style[key] = formatUnit(value)
+                        this.node.style[key] = value
                         if (value.indexOf('%') !== -1) {
                             console.error('canvas宽高不支持设置百分比')
                         }
-                        this.node.height = formatPureNumberPxUnit(value) * this.resolution
+                        this.node.height = formatWebPureNumberPxUnit(value) * this.resolution
                         break
-                    default:
-                        this.node.style[key] = formatUnit(value)
                 }
                 return true
             }
         })
-    }
-    get style() {
-        return this._style
-    }
-
-    set style(_style: CanvasStyle) {
-        this._style = Object.assign(this._style, _style)
     }
     protected createNode() {
         this.node = document.createElement('canvas')
@@ -233,7 +224,6 @@ export class CanvasView extends View {
         x = formatPureNumberPxUnit(x)
         y = formatPureNumberPxUnit(y)
         radius = formatPureNumberPxUnit(radius)
-        console.log(x, y, radius)
         let lineColor = this.ctx.strokeStyle
         this.ctx.beginPath()
         this.lineColor('rgba(0,0,0,0)')

@@ -38,8 +38,22 @@ export class ViewPager extends View {
     // @ts-ignore
     this._style = this._style = new Proxy(this._style, {
       get: (target, key) => {
-        // @ts-ignore
-        return target[key] || this.node.style[key]
+        switch (key) {
+          case 'edgeSpacing':
+          case 'borderRadius':
+          case 'itemSpacing':
+          case 'loopInterval':
+            return target[key] || this.node.style[key] || 0
+          case 'scaleFactor':
+            return target[key] || this.node.style[key] || (this.style.edgeSpacing > 0 ? 0.85 : 1)
+          case 'alphaFactor':
+            return target[key] || this.node.style[key] || (this.style.edgeSpacing > 0 ? 0.5 : 1)
+          case 'canLoop':
+          case 'autoPlay':
+            return target[key] || this.node.style[key] || false
+          default:
+            return target[key] || this.node.style[key]
+        }
       },
       set: (target, key, value) => {
         // 设置style
@@ -63,8 +77,6 @@ export class ViewPager extends View {
               disableOnInteraction: false,
             }, this.swiper.update())
             break
-          default:
-            this.node.style[key] = value
         }
         return true
       }
@@ -107,7 +119,7 @@ export class ViewPager extends View {
   init() {
     let initSuccess = false
     let that = this;
-    let translateX = (this.node.offsetWidth - this.style.edgeSpacing * 2) * (this.style.scaleFactor || 0.85) + (this.node.offsetWidth - this.style.edgeSpacing * 2) * ((1 - (this.style.scaleFactor || 0.85)) / 2) + this.style.itemSpacing;
+    let translateX = (this.node.offsetWidth - this.style.edgeSpacing * 2) * (this.style.scaleFactor) + (this.node.offsetWidth - this.style.edgeSpacing * 2) * ((1 - (this.style.scaleFactor)) / 2) + this.style.itemSpacing;
     let transitionFlag = false;
     this.swiper = new Swiper(this.node, {
       loop: this.style.canLoop, // 是否可以无限循环
@@ -129,13 +141,13 @@ export class ViewPager extends View {
         limitProgress: 2,
         prev: {
           translate: [-translateX, 0, 0],
-          scale: this.style.scaleFactor || 0.85,
-          opacity: this.style.alphaFactor || 0.5
+          scale: this.style.scaleFactor,
+          opacity: this.style.alphaFactor
         },
         next: {
           translate: [translateX, 0, 0],
-          scale: this.style.scaleFactor || 0.85,
-          opacity: this.style.alphaFactor || 0.5
+          scale: this.style.scaleFactor,
+          opacity: this.style.alphaFactor
         }
       },
       on: {
@@ -241,6 +253,10 @@ export class ViewPager extends View {
     initSuccess = true
   }
 
+  protected defaultStyle() {
+    this.node.classList.add('hm-view-pager')
+  }
+
   protected createNode() {
     this.node = document.createElement('div')
   }
@@ -250,7 +266,8 @@ export class ViewPager extends View {
   }
 
   set style(_style: ViewPagerStyle) {
-    let standardStyle = styleTransformer.transformStyle(_style);
+    let deepStyle = JSON.parse(JSON.stringify(_style))
+    let standardStyle = styleTransformer.transformStyle(deepStyle);
     this._style = Object.assign(this._style, standardStyle)
   }
   get data() {

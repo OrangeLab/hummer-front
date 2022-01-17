@@ -1,6 +1,7 @@
 import { View, ViewStyle } from './View'
 // import { Image } from './Image'
 import { formatUnit } from '../../common/utils'
+import { styleTransformer } from '../../common/style'
 export interface TextStyle extends ViewStyle {
   color?: string
   textAlign?: 'left' | 'center' | 'right'
@@ -40,14 +41,33 @@ export class Text extends View {
           case 'lineSpacingMulti':
             this.node.style.lineHeight = value
             break
-          case 'textLineClamp':
-            this.node.style['-webkitLineClamp'] = value
-            this.node.style.overflow = 'hidden'
-            this.node.style.display = '-webkit-box'
-            this.node.style['-webkitBoxOrient'] = 'vertical'
+          case 'textAlign':
+            switch (value) {
+              case 'left':
+                this.node.style.justifyContent = 'flex-start'
+                break;
+              case 'center':
+                this.node.style.justifyContent = 'center'
+                break;
+              case 'right':
+                this.node.style.justifyContent = 'flex-end'
+                break;
+              default:
+                break;
+            }
             break
-          default:
-            this.node.style[key] = formatUnit(value)
+          case 'textLineClamp':
+            if (value === 0) {
+              this.node.style.display = 'flex'
+            } else {
+              this.node.style['-webkitLineClamp'] = value
+              this.node.style.overflow = 'hidden'
+              this.node.style.display = '-webkit-box'
+              this.node.style['-webkitBoxOrient'] = 'vertical'
+            }
+            break
+          case 'letterSpacing':
+            this.node.style['letterSpacing'] = `${value}em`
             break
         }
         return true
@@ -68,7 +88,9 @@ export class Text extends View {
   }
 
   set style(_style: TextStyle) {
-    this._style = Object.assign(this._style, _style)
+    let deepStyle = JSON.parse(JSON.stringify(_style))
+    let standardStyle = styleTransformer.transformStyle(deepStyle);
+    this._style = Object.assign(this._style, standardStyle)
   }
 
   get text() {
@@ -104,7 +126,18 @@ export class Text extends View {
         image = document.createElement('img')
         image.src = item.image
         image.alt = "加载失败"
-        image.style.verticalAlign = item.imageAlign === 'center' ? 'middle' : item.imageAlign
+        image.style.alignSelf = 'baseline'
+        switch (item.imageAlign) {
+          case 'top':
+            image.style.alignSelf = 'flex-start'
+            break;
+          case 'bottom':
+            image.style.alignSelf = 'flex-end'
+            break;
+          default:
+            image.style.alignSelf = item.imageAlign
+            break;
+        }
         image.style.width = formatUnit(item.imageWidth)
         image.style.height = formatUnit(item.imageHeight)
         this.node.appendChild(image)
@@ -119,7 +152,6 @@ export class Text extends View {
         item?.fontFamily && (text.style.fontFamily = item?.fontFamily)
         item?.fontWeight && (text.style.fontWeight = item?.fontWeight)
         item?.textDecoration && (text.style.textDecoration = item?.textDecoration)
-        text.style.verticalAlign = 'middle'
         if (item?.href) {
           text.style.textDecoration = 'underline'
           text.onclick = () => {
