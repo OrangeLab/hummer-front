@@ -1,5 +1,5 @@
 import { View, ViewStyle } from './View'
-import { formatUnit } from '../../common/utils'
+import { styleTransformer } from '../../common/style'
 // TODO Image Component 对接
 export interface ImageStyle extends ViewStyle {
   // 图片拉伸模式
@@ -34,12 +34,11 @@ export class Image extends View {
           case 'resize':
             this.setImageResizeMode(value)
             break
-          default:
-            this.node.style[key] = formatUnit(value)
         }
         return true
       }
     })
+    this.setImageResizeMode('default');
   }
 
   protected createNode() {
@@ -47,7 +46,7 @@ export class Image extends View {
   }
 
   private setImageResizeMode(value: string) {
-    switch (value) {
+    switch (value || 'default') {
       case 'origin':
         this.node.style.backgroundSize = 'initial'
         this.node.style.backgroundRepeat = 'no-repeat'
@@ -80,7 +79,9 @@ export class Image extends View {
   }
 
   set style(_style: ImageStyle) {
-    this._style = Object.assign(this._style, _style)
+    let deepStyle = JSON.parse(JSON.stringify(_style))
+    let standardStyle = styleTransformer.transformStyle(deepStyle)
+    this._style = Object.assign(this._style, standardStyle)
   }
   get src() {
     return this._src
@@ -104,7 +105,7 @@ export class Image extends View {
     return 0
   }
 
-  set gifRepeatCount(gifRepeatCount: number) {}
+  set gifRepeatCount(gifRepeatCount: number) { }
 
   set onload(onload: Function) {
     this.node.onload = onload
@@ -113,5 +114,5 @@ export class Image extends View {
   get onload() {
     return this.node.onload
   }
-  
+
 }

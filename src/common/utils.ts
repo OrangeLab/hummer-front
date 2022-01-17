@@ -55,7 +55,7 @@ export function formatUnit(size: number | string) {
 export function formatPureNumberPxUnit(size: number | string): number {
   let formatUnitResult = formatUnit(size)
   if (formatUnitResult.indexOf('rem') !== -1) {
-    return (parseFloat(formatUnitResult) / 750 * (inIframe()?document.body.offsetWidth:window.screen.width));
+    return (parseFloat(formatUnitResult) / 750 * (inIframe() ? document.body.offsetWidth : window.screen.width));
   } else if (formatUnitResult.indexOf('px') !== -1) {
     return parseFloat(formatUnitResult.replace('px', ''))
   }
@@ -66,10 +66,10 @@ export function formatPureNumberPxUnit(size: number | string): number {
  * @param size 
  * @returns 
  */
- export function formatWebPureNumberPxUnit(size: string): number {
+export function formatWebPureNumberPxUnit(size: string): number {
   let formatUnitResult = size || '0'
   if (formatUnitResult.indexOf('rem') !== -1) {
-    return (parseFloat(formatUnitResult) / 750 * (inIframe()?document.body.offsetWidth:window.screen.width));
+    return (parseFloat(formatUnitResult) / 750 * (inIframe() ? document.body.offsetWidth : window.screen.width));
   } else if (formatUnitResult.indexOf('px') !== -1) {
     return parseFloat(formatUnitResult.replace('px', ''))
   } else {
@@ -188,13 +188,92 @@ export const inIframe = () => {
  * @param fn 需要节流的函数
  * @param wait 节流的时间
  */
-export const throttle = (fn, wait) => {
-    var timeout;
-    return function() {
-      var ctx = this, args = arguments;
-      clearTimeout(timeout);
-      timeout = setTimeout(function() {
-        fn.apply(ctx, args);
-      }, wait);
-    };
+export const throttle = (fn: Function, wait: number = 200) => {
+  var timeout;
+  return function () {
+    var ctx = this, args = arguments;
+    clearTimeout(timeout);
+    timeout = setTimeout(function () {
+      fn.apply(ctx, args);
+    }, wait);
+  };
+}
+/**
+ * 防抖
+ * @param func 需要防抖的函数
+ * @param wait 防抖的时间
+ * @param flag (布尔值):是否需要第一次触发事件立即执行(不传入flag则默认为false,不会立即执行第一次)
+ */
+export const debounce = (func: Function, wait: number, flag: boolean) => {
+  let timer, args, that;
+  return function () {
+    //args包含了func的事件对象,that为func的this指向(应当指向事件源)
+    args = arguments;
+    that = this;
+    let callnow = flag && !timer;
+    if (callnow) func.apply(that, args); //不传入参数flag这段行代码不执行
+    clearTimeout(timer);
+    timer = setTimeout(function () {
+      timer = null;
+      if (!flag) func.apply(that, args);
+    }, wait);
+  };
+}
+
+export const getBoxModelValue = (elem: any):object => {
+  return {
+    display: getStyle(elem, "display"),
+    position: getStyle(elem, "position"),
+    top: getStyle(elem, "top"),
+    right: getStyle(elem, "right"),
+    bottom: getStyle(elem, "bottom"),
+    left: getStyle(elem, "left"),
+    marginTop: getStyle(elem, "marginTop"),
+    marginRight: getStyle(elem, "marginRight"),
+    marginBottom: getStyle(elem, "marginBottom"),
+    marginLeft: getStyle(elem, "marginLeft"),
+    borderTopWidth: getStyle(elem, "borderTopWidth"),
+    borderRightWidth: getStyle(elem, "borderRightWidth"),
+    borderBottomWidth: getStyle(elem, "borderBottomWidth"),
+    borderLeftWidth: getStyle(elem, "borderLeftWidth"),
+    paddingTop: getStyle(elem, "paddingTop"),
+    paddingRight: getStyle(elem, "paddingRight"),
+    paddingBottom: getStyle(elem, "paddingBottom"),
+    paddingLeft: getStyle(elem, "paddingLeft"),
+    contentWidth:
+      elem.offsetWidth -
+      parseInt(getStyle(elem, "paddingLeft")) -
+      parseInt(getStyle(elem, "paddingRight")) -
+      parseInt(getStyle(elem, "borderLeftWidth")) -
+      parseInt(getStyle(elem, "borderRightWidth")),
+    contentHeight:
+      elem.offsetHeight -
+      parseInt(getStyle(elem, "paddingTop")) -
+      parseInt(getStyle(elem, "paddingBottom")) -
+      parseInt(getStyle(elem, "borderTopWidth")) -
+      parseInt(getStyle(elem, "borderBottomWidth")),
+    windowTop: elem.getBoundingClientRect().top,
+    windowLeft: elem.getBoundingClientRect().left,
+    offsetWidth: elem.offsetWidth,
+    offsetHeight: elem.offsetHeight,
+    nodeName: elem.nodeName.toLowerCase(),
+    id: elem.id,
+    className: elem.className,
+    __view_id: elem.__view_id,
+    nodeType: elem.nodeType,
+    tagName: elem.tagName,
+  };
+}
+const getStyle = (elem: any, attr: string) => {
+  let attrStyle = null;
+  if (elem?.currentStyle) {
+    attrStyle = elem.currentStyle[attr];
+  } else {
+    attrStyle = document.defaultView.getComputedStyle(elem, null)[attr];
   }
+  if (attrStyle.indexOf("px") !== -1) {
+    return /\d+/.exec(attrStyle)[0];
+  } else {
+    return attrStyle;
+  }
+}

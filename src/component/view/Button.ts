@@ -1,4 +1,3 @@
-import Hammer from 'hammerjs'
 import { View, ViewStyle } from './View'
 export interface ButtonStyle extends ViewStyle {
   textAlign?: 'left' | 'center' | 'right'
@@ -19,14 +18,44 @@ export class Button extends View {
     super()
     this.defaultStyle()
     this.init()
+    this._style = new Proxy(this._style, {
+      get: (target, key) => {
+        // @ts-ignore
+        return target[key] || this.node.style[key]
+      },
+      set: (target, key, value) => {
+        // 设置style
+        // @ts-ignore
+        target[key] = value
+        switch (key) {
+          case 'textAlign':
+            switch (value) {
+              case 'left':
+                this.node.style.justifyContent = 'flex-start'
+                break;
+              case 'center':
+                this.node.style.justifyContent = 'center'
+                break;
+              case 'right':
+                this.node.style.justifyContent = 'flex-end'
+                break;
+              default:
+                break;
+            }
+            break
+        }
+        return true
+      }
+    })
   }
   protected defaultStyle() {
     this.node.classList.add('hm-default-button')
   }
 
   private init() {
-    const hammer = new Hammer(this.node)
-    const pressEvent = () => {
+    const pressEvent = (e) => {
+      e.stopPropagation();
+      e.preventDefault();
       if (!this.enabled) return
       if (this.pressed) {
         // 记录press之前的样式
@@ -43,7 +72,9 @@ export class Button extends View {
         this.style = this.pressed
       }
     }
-    const pressUpEvent = () => {
+    const pressUpEvent = (e) => {
+      e.stopPropagation();
+      e.preventDefault();
       if (!this.enabled) return
       if (this._beforePressedStyle) {
         // 恢复pressed之前的样式
@@ -52,10 +83,20 @@ export class Button extends View {
       }
       // Todo: 事件中断处理？可以通过代理全局对象进行代理来做样式兜底
     }
-    hammer.on('press', pressEvent)
-    hammer.on('pressup', pressUpEvent)
-  }
+    const touchmove = (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+    }
+    this.node.addEventListener('touchstart', pressEvent, false)
+    this.node.addEventListener('touchend', pressUpEvent, false)
+    this.node.addEventListener('touchcancel', pressUpEvent, false)
+    this.node.addEventListener('touchmove', touchmove.bind(this), false)
 
+    this.node.addEventListener('mousedown', pressEvent, false)
+    this.node.addEventListener('mouseup', pressUpEvent, false)
+    this.node.addEventListener('mouseout', pressUpEvent, false)
+
+  }
   protected createNode() {
     this.node = document.createElement('button')
   }
@@ -107,7 +148,6 @@ export class Button extends View {
   }
 
   set disabled(value: ButtonStyle) {
-    // console.log('_disabled style', value)
     // 设置样式
     this._disabled = value
     // 触发enabled的修改，更新样式s

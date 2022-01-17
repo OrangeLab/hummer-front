@@ -1,8 +1,9 @@
 // @ts-nocheck
 .hm-default-text-box {
-  display: inline-block;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
   text-overflow: ellipsis;
-  vertical-align: middle;
   overflow: hidden;
   max-width: 100%;
   .hm-default-text{
