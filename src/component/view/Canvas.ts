@@ -49,7 +49,7 @@ export class CanvasView extends View {
     * @param widthValue 粗细值，支持px，hm 单位， 如果不写单位就是dp
     */
     lineWidth(widthValue) {
-        this.ctx.lineWidth = formatPureNumberPxUnit(widthValue)
+        this.ctx.lineWidth = formatPureNumberPxUnit(widthValue) * this.resolution
     }
     /**
      * 设置线头样式
