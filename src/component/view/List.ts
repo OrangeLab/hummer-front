@@ -155,6 +155,7 @@ export class List extends View {
   /**
    * @ignore
    */
+  // @ts-ignore
   onCreate!: (type: number) => View
   /**
    * @not support
@@ -537,7 +538,10 @@ export class List extends View {
         scrollX: this.style.scrollDirection === 'horizontal',
         scrollY: this.style.scrollDirection !== 'horizontal',
         pullUpLoad: this.loadMoreView ? true : false,
-        pullDownRefresh: this.refreshView ? true : false,
+        pullDownRefresh: this.refreshView ? {
+          threshold: this.refreshView?.node?.offsetHeight||40,
+          stop: this.refreshView?.node?.offsetHeight||40
+        } : false,
         click: true,
         dblclick: true,
         tap: 'tap',

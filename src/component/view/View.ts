@@ -10,7 +10,7 @@ import { LongPressEvent, LongPressState } from '../event/LongPressEvent'
 import { ScrollEvent } from '../event/ScrollEvent'
 import { BasicAnimation } from '../BasicAnimation'
 import { KeyframeAnimation } from '../KeyframeAnimation'
-import { formatUnit, getQueryVariable } from '../../common/utils'
+import { formatUnit, getQueryVariable, isEmptyFunction } from '../../common/utils'
 import { isNeedUnitTrasform } from '../../common/style/transformer/unit'
 import { styleTransformer } from '../../common/style'
 export const SIZE_STYLE: Array<any> = [
@@ -151,11 +151,11 @@ export class View {
     [key: string]: { hammer?: any; listener?: Function;[key: string]: any }
   }
   protected animations: { [key: string]: Animation }
-  protected onCreate?: Function // 页面首次加载时触发
-  protected onAppear?: Function // 页面显示
-  protected onDisappear?: Function // 页面隐藏
-  protected onDestroy?: Function // 页面销毁
-  protected onBack?: Function // 页面返回
+  // protected onCreate?: Function // 页面首次加载时触发
+  // protected onAppear?: Function // 页面显示
+  // protected onDisappear?: Function // 页面隐藏
+  // protected onDestroy?: Function // 页面销毁
+  // protected onBack?: Function // 页面返回
   isHighlight?: Boolean
 
   layout!: () => void
@@ -179,7 +179,7 @@ export class View {
         set: (target, key, value) => {
           switch (key) {
             case 'flexShrink':
-              if(value === 1){
+              if (value === 1) {
                 this.node.style['overflow'] = 'hidden'
               }
               this.node.style[key] = value
@@ -218,18 +218,18 @@ export class View {
     this.initialize()
     window.addEventListener('render-ready', () => {
       // this.formatBasicAnimation()
-      this?.onCreate && this.onCreate()
-      this?.onAppear && this.onAppear()
-      if (this?.onAppear || this?.onDisappear) {
+      !isEmptyFunction(this.onCreate) && this.onCreate()
+      !isEmptyFunction(this.onAppear) && this.onAppear()
+      if (!isEmptyFunction(this.onAppear) || !isEmptyFunction(this.onDisappear)) {
         document.addEventListener("visibilitychange", this.visibilityChange.bind(this));
       }
-      if (this?.onBack) {
+      if (!isEmptyFunction(this.onBack)) {
         if (window.history && window.history.pushState) {
           history.pushState(null, null, document.URL);
           window.addEventListener('popstate', this.interceptBack.bind(this), false);
         }
       }
-      if (this?.onCreate && getQueryVariable('navBar') && this.node.parentNode.tagName === 'BODY') {
+      if (!isEmptyFunction(this.onCreate) && getQueryVariable('navBar') && this.node.parentNode.tagName === 'BODY') {
         let navBar = new View
         let navBarTitle = new View
         let navBarBack = new View
@@ -257,8 +257,7 @@ export class View {
     }
   }
   interceptBack() {
-    console.log('123123');
-    let isIntercept = this?.onBack()
+    let isIntercept = this?.onBack() as unknown as boolean
     if (isIntercept) {
       history.pushState(null, null, document.URL);
     } else {
@@ -266,26 +265,26 @@ export class View {
       history.go(-1);
     }
   }
-  //   /**
-  //    * 页面首次加载时触发
-  //    */
-  //   onCreate() { }
-  //   /**
-  //   * 页面显示周期
-  //   */
-  //   onAppear() { }
-  //   /**
-  //    * 页面隐藏
-  //    */
-  //   onDisappear() { }
-  //   /**
-  //   * 页面销毁
-  //   */
-  //   onDestroy() { }
-  //   /**
-  //  * 页面返回
-  //  */
-  //   onBack() { }
+  /**
+   * 页面首次加载时触发
+   */
+  onCreate() { }
+  /**
+  * 页面显示周期
+  */
+  onAppear() { }
+  /**
+   * 页面隐藏
+   */
+  onDisappear() { }
+  /**
+  * 页面销毁
+  */
+  onDestroy() { }
+  /**
+ * 页面返回
+ */
+  onBack() { }
   private playBasicAnimation(animation) {
     const {
       keyframes,

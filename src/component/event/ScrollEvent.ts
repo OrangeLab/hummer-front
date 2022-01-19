@@ -16,6 +16,7 @@ export class ScrollEvent extends Event {
   public dx!: number
   public dy!: number
   public timestamp!: string
+  public target!: any
 
   get type(): EventType {
     return 'scroll'

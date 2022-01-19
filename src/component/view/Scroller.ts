@@ -161,7 +161,7 @@ export class Scroller extends View {
         scrollY: true,
         pullUpLoad: this.loadMoreView ? true : false,
         pullDownRefresh: this.refreshView ? {
-          threshold: 40,
+          threshold: this.refreshView?.node?.offsetHeight||40,
           stop: this.refreshView?.node?.offsetHeight||40
         } : false,
         click: true,

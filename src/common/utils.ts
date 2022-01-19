@@ -277,3 +277,17 @@ const getStyle = (elem: any, attr: string) => {
     return attrStyle;
   }
 }
+
+/**
+ * 判断空函数体
+ * @param func 需要判断的函数
+ */
+export const isEmptyFunction = (func:Function):boolean =>{
+  if(typeof func != 'function'){
+      console.log('请输入函数')
+      return false
+  }
+  let str = func.toString().replace(/\s+/g,'')
+  str = str.match(/{.*}/g)[0]
+  return str === '{}'
+}
