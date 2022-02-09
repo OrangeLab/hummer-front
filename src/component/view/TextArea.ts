@@ -42,6 +42,7 @@ export class TextArea extends Input {
       }
     })
     this.node.rows = 1
+    this.changeHandler = this.change.bind(this);
     this.autoTextarea();
   }
   get focused() {
@@ -81,7 +82,6 @@ export class TextArea extends Input {
   */
   autoTextarea() {
     this.node.style.resize = 'none';
-    this.changeHandler = this.change.bind(this);
     this.removeAutoTextarea();
     this.node.addEventListener('propertychange', this.changeHandler);
     this.node.addEventListener('input', this.changeHandler);

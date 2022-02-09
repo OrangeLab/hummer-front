@@ -331,7 +331,7 @@ export class List extends View {
       this.onUpdate((count - this.rowCount) >= 0 ? (index + this.rowCount) : index, cell)
       const row = new View()
       if (this.style.lineSpacing) {
-        if (index > 0) {
+        if (((count - this.rowCount) >= 0 ? (index + this.rowCount) : index) > 0) {
           if (this.style.scrollDirection === 'horizontal') {
             row.node.style.marginLeft = formatUnit(this.style.lineSpacing)
           } else {
@@ -539,8 +539,8 @@ export class List extends View {
         scrollY: this.style.scrollDirection !== 'horizontal',
         pullUpLoad: this.loadMoreView ? true : false,
         pullDownRefresh: this.refreshView ? {
-          threshold: this.refreshView?.node?.offsetHeight||40,
-          stop: this.refreshView?.node?.offsetHeight||40
+          threshold: this.refreshView?.node?.offsetHeight || 40,
+          stop: this.refreshView?.node?.offsetHeight || 40
         } : false,
         click: true,
         dblclick: true,

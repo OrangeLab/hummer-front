@@ -194,17 +194,24 @@ export class View {
               let newBackgroundColor = value.match(ColorReg)
               let backgroundColor = this.node.style['backgroundImage'].match(ColorReg)
               backgroundUrl = this.node.style['backgroundImage'].match(urlReg)
-              if (backgroundUrl && newBackgroundUrl) {
-                this.node.style['backgroundImage'].replaceAll(urlReg, newBackgroundUrl[0])
-              }
-              if (newBackgroundColor && backgroundColor) {
-                this.node.style['backgroundImage'].replaceAll(ColorReg, newBackgroundColor[0])
-              }
-              if (!backgroundUrl && !backgroundColor) {
-                this.node.style['backgroundImage'] = value
+              if (!newBackgroundUrl && !newBackgroundColor && !backgroundColor) {
+                this.node.style['backgroundImage'] = `url(${value})`
+              } else if (!newBackgroundUrl && !newBackgroundColor && backgroundColor) {
+                this.node.style['backgroundImage'] = `url(${value}),${backgroundColor}`
               } else {
-                this.node.style['backgroundImage'] = `${this.node.style['backgroundImage']},${value}`
+                if (backgroundUrl && newBackgroundUrl) {
+                  this.node.style['backgroundImage'].replaceAll(urlReg, newBackgroundUrl[0])
+                }
+                if (newBackgroundColor && backgroundColor) {
+                  this.node.style['backgroundImage'].replaceAll(ColorReg, newBackgroundColor[0])
+                }
+                if (!backgroundUrl && !backgroundColor) {
+                  this.node.style['backgroundImage'] = value
+                } else {
+                  this.node.style['backgroundImage'] = `${this.node.style['backgroundImage']},${value}`
+                }
               }
+              this.node.style['backgroundSize'] = 'cover'
               break;
             default:
               this.node.style[key] = value

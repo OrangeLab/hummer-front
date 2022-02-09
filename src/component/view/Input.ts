@@ -22,66 +22,70 @@ export class Input extends View {
 
   constructor() {
     super()
-    this._style = new Proxy(this._style,{
-        get: (target, key) => {
-          switch (key) {
-            case 'type':
-              // @ts-ignore
-              return target[key] || this.node.type
-            case 'maxLength':
-              // @ts-ignore
-              return target[key] || this.node.maxLength
-            case 'placeholderColor':
-            case 'placeholderFontSize':
-            case 'returnKeyType':
-              // @ts-ignore
-              return target[key]
-            case 'cursorColor':
-              // @ts-ignore
-              return target[key] || this.node.style['caretColor']
-            case 'color':
-            case 'fontSize':
-            default:
-              // @ts-ignore
-              return target[key] || this.node.style[key]
-          }
-          // 获取style
-        },
-        set: (target, key, value) => {
-          // 设置style
-          target[key] = value
-          switch (key) {
-            case 'type':
-              this.node.type!=='textarea'&&(this.node.type = value)
-              break
-            case 'placeholderColor':
-              this.changePlaceholder({
-                color: value,
-                fontSize: this.style.fontSize
-              })
-              break
-            case 'placeholderFontSize':
-              this.changePlaceholder({
-                color: this.style.placeholderColor,
-                fontSize: value
-              })
-              break
-            case 'cursorColor':
-              this.node.style.caretColor = value
-              break
-            case 'maxLength':
-              this.node.maxLength = value
-              break
-            case 'returnKeyType':
-              break
-            case 'color':
-            case 'fontSize':
-            default:
-              this.node.style[key] = value
-          }
-          return true
+    this._style = new Proxy(this._style, {
+      get: (target, key) => {
+        switch (key) {
+          case 'type':
+            // @ts-ignore
+            return target[key] || this.node.type
+          case 'maxLength':
+            // @ts-ignore
+            return target[key] || this.node.maxLength
+          case 'placeholderColor':
+          case 'placeholderFontSize':
+          case 'returnKeyType':
+            // @ts-ignore
+            return target[key]
+          case 'cursorColor':
+            // @ts-ignore
+            return target[key] || this.node.style['caretColor']
+          case 'color':
+          case 'fontSize':
+          default:
+            // @ts-ignore
+            return target[key] || this.node.style[key]
         }
+        // 获取style
+      },
+      set: (target, key, value) => {
+        // 设置style
+        target[key] = value
+        switch (key) {
+          case 'type':
+            this.node.type !== 'textarea' && (this.node.type = value)
+            break
+          case 'placeholderColor':
+            this.changePlaceholder({
+              color: value,
+              fontSize: this.style.fontSize
+            })
+            break
+          case 'placeholderFontSize':
+            this.changePlaceholder({
+              color: this.style.placeholderColor,
+              fontSize: value
+            })
+            break
+          case 'cursorColor':
+            this.node.style.caretColor = value
+            break
+          case 'maxLength':
+            if (value === 0) {
+              this.node.removeAttribute('maxLength')
+            } else {
+              this.node.maxLength = value
+            }
+            break
+          case 'returnKeyType':
+            break
+          case 'color':
+          case 'fontSize':
+          default:
+            this.node.style[key] = value
+        }
+        return true
       }
+    }
     )
   }
   protected defaultStyle() {

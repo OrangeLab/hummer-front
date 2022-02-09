@@ -8,7 +8,7 @@ import { makeMapByArrOfKebab, formatUnit } from "../../utils"
 // 待转换单位的属性列表
 export const unitAttrs = [
   'font-size', 'placeholder-font-size', 'transform',
-  'flex-basis','shadow',
+  'flex-basis', 'shadow', 'box-shadow',
   'width', 'max-width', 'min-width', 'height', 'max-height', 'min-height', 'line-height',
   'padding', 'padding-left', 'padding-right', 'padding-bottom', 'padding-top',
   'margin', 'margin-left', 'margin-right', 'margin-bottom', 'margin-top',
@@ -29,7 +29,7 @@ export function transformUnit(style: Record<string, string>) {
     }
     if (isNeedUnitTrasform(key)) {
       let value
-      if (key.indexOf('shadow') !== -1) {
+      if (key.indexOf('shadow') !== -1 || key.indexOf('boxShadow') !== -1) {
         value = style[key].trim().replaceAll(/[0-9](.*?)[\s+,*]+/g, function (word) {
           return transformUnitValue(word.trim()) + ' '
         });
