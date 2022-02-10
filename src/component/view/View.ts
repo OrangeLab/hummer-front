@@ -950,7 +950,7 @@ export class View {
       options: {
         fill: 'forwards',
         easing: ani[0].easing,
-        delay: ani[0].delay || 0,
+        delay: ani[0]?.delay && (ani[0].delay * 1000) || 0,
         direction: 'normal',
         duration: ani[0].duration * 1000,
         iterations: ani[0].repeatCount < 0 ? 'Infinity' : (ani[0].repeatCount === 0 || ani[0].repeatCount === 1 ? 1 : ani[0].repeatCount)
@@ -969,7 +969,7 @@ export class View {
       options: {
         fill: 'forwards',
         easing: ani.easing,
-        delay: ani.delay || 0,
+        delay: ani?.delay && (ani.delay * 1000) || 0,
         direction: 'normal',
         duration: ani.duration * 1000,
         iterations: ani.repeatCount < 0 ? 'Infinity' : (ani.repeatCount === 0 || ani.repeatCount === 1 ? 1 : ani.repeatCount)
