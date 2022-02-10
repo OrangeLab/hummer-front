@@ -159,6 +159,7 @@ export class View {
   isHighlight?: Boolean
 
   layout!: () => void
+  isrender: boolean
 
   constructor(public viewID?: string) {
     let backgroundUrl
@@ -170,6 +171,7 @@ export class View {
     this.listeners = {}
     this.eventListeners = {}
     this.animations = {}
+    this.isrender = false
     this._style = new Proxy(
       {},
       {
@@ -224,7 +226,8 @@ export class View {
     this.defaultStyle()
     this.initialize()
     window.addEventListener('render-ready', () => {
-      // this.formatBasicAnimation()
+      this.formatBasicAnimation();
+      this.isrender = true;
       !isEmptyFunction(this.onCreate) && this.onCreate()
       !isEmptyFunction(this.onAppear) && this.onAppear()
       if (!isEmptyFunction(this.onAppear) || !isEmptyFunction(this.onDisappear)) {
@@ -298,11 +301,12 @@ export class View {
       options
     } = this.getBasicAnimationKeyFrameAnimationOptions(animation)
     const animate: Animation = this.node.animate(keyframes, options)
-    // this.animations[key] = animate
-    animation.onstart && animation.onstart()
+    animation[0].onstart && animation[0].onstart()
     animate.onfinish = () => {
+      animation.forEach(element => {
+        element.onend && element.onend()
+      });
       this.basicAnimationArray.shift()
-      animation.onend && animation.onend()
       if (this.basicAnimationArray.length >= 1) {
         this.playBasicAnimation(this.basicAnimationArray[this.basicAnimationArray.length - 1])
       }
@@ -314,14 +318,18 @@ export class View {
     let newBasicAnimationArray: Array<Array<any>> = []
     let numSize = -1
     let oldKeyNum
-    this.basicAnimationArray.forEach(item => {
-      let keyNum = parseInt(Object.keys(item)[0].split('_')[Object.keys(item)[0].split('_').length - 2]);
-      if (oldKeyNum !== keyNum) {
-        numSize++
+    this.basicAnimationArray.forEach((item, index) => {
+      if (Object.prototype.toString.call(item) === '[object Array]') {
+        newBasicAnimationArray[0] = item
+      } else {
+        let keyNum = parseInt(Object.keys(item)[0].split('_')[Object.keys(item)[0].split('_').length - 2]);
+        if (oldKeyNum !== keyNum) {
+          numSize++
+        }
+        oldKeyNum = keyNum
+        !newBasicAnimationArray[numSize] && (newBasicAnimationArray[numSize] = [])
+        newBasicAnimationArray[numSize].push(item[Object.keys(item)[0]])
       }
-      oldKeyNum = keyNum
-      !newBasicAnimationArray[numSize] && (newBasicAnimationArray[numSize] = [])
-      newBasicAnimationArray[numSize].push(item[Object.keys(item)[0]])
     });
     this.basicAnimationArray = newBasicAnimationArray
     if (this.basicAnimationArray.length > 0) {
@@ -814,7 +822,9 @@ export class View {
       let a = {}
       a[`${key}`] = animation
       this.basicAnimationArray.push(a);
-      this.formatBasicAnimation();
+      if (this.isrender) {
+        this.formatBasicAnimation();
+      }
     } else if (animation instanceof KeyframeAnimation) {
       // 帧动画
       const { keyframes, options } = this.getKeyframeAnimationOptions(animation)
