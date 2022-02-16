@@ -159,8 +159,7 @@ export class View {
   isHighlight?: Boolean
 
   layout!: () => void
-  isrender: boolean
-
+  isrender: boolean = false
   constructor(public viewID?: string) {
     let backgroundUrl
     let urlReg = /url\("?'?.((?!\,).)*"?'?\)/g
@@ -171,7 +170,6 @@ export class View {
     this.listeners = {}
     this.eventListeners = {}
     this.animations = {}
-    this.isrender = false
     this._style = new Proxy(
       {},
       {
@@ -822,7 +820,7 @@ export class View {
       let a = {}
       a[`${key}`] = animation
       this.basicAnimationArray.push(a);
-      if (this.isrender) {
+      if (this.isrender || document.readyState === 'complete') {
         this.formatBasicAnimation();
       }
     } else if (animation instanceof KeyframeAnimation) {
