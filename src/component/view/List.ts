@@ -51,19 +51,20 @@ export class List extends View {
     this._style = new Proxy(this._style, {
       get: (target, key) => {
         // 获取style
-        // @ts-ignore
         return target[key] || this.node.style[key]
       },
       set: (target, key, value) => {
         // 设置style
-        // @ts-ignore
-        target[key] = value
         switch (key) {
           case 'mode':
-            this.mode = value
-            this.bscroll && this.refresh(this.rowCount)
+            if (this.mode !== value) {
+              this.mode = value
+              target[key] = value
+              this.bscroll && this.refresh(this.rowCount)
+            }
             break
           case 'scrollDirection':
+            target[key] = value
             if (value === 'vertical') {
               this.node.classList.remove('horizontal')
               this.node.classList.add(value)
@@ -73,47 +74,64 @@ export class List extends View {
             }
             break
           case 'column':
-            this.bscroll && this.refresh(this.rowCount)
+            if (this.style?.column !== value) {
+              target[key] = value
+              this.bscroll && this.refresh(this.rowCount)
+            }
             break
           case 'lineSpacing':
-            this.recyclerView?.node?.childNodes?.forEach((element: Element, index: Number) => {
-              if (this.style.scrollDirection === 'horizontal') {
-                if (value && index > 0) {
-                  // @ts-ignore
-                  element.style.marginLeft = formatUnit(value)
+            if (this.style?.lineSpacing !== value) {
+              target[key] = value
+              this.recyclerView?.node?.childNodes?.forEach((element: Element, index: Number) => {
+                if (this.style.scrollDirection === 'horizontal') {
+                  if (value && index > 0) {
+                    // @ts-ignore
+                    element.style.marginLeft = formatUnit(value)
+                  }
+                } else {
+                  // 竖向滚动
+                  if (value && index > 0) {
+                    // @ts-ignore
+                    element.style.marginTop = formatUnit(value)
+                  }
                 }
-              } else {
-                // 竖向滚动
-                if (value && index > 0) {
-                  // @ts-ignore
-                  element.style.marginTop = formatUnit(value)
-                }
-              }
-            });
+              });
+            }
             break
           case 'itemSpacing':
-            this.bscroll && this.refresh(this.rowCount)
+            if (this.style?.itemSpacing !== value) {
+              target[key] = value
+              this.bscroll && this.refresh(this.rowCount)
+            }
             break
           case 'bounces':
-            if (this.bscroll) {
-              this.bscroll.destroy()
-              this.bscroll = null
-              this.refresh(this.rowCount)
+            if (!this.style?.bounces || this.style.bounces !== value) {
+              target[key] = value
+              if (this.bscroll) {
+                this.bscroll.destroy()
+                this.bscroll = null
+                this.refresh(this.rowCount)
+              }
             }
             break
           case 'leftSpacing':
+            target[key] = value
             this.recyclerView.style['paddingLeft'] = formatUnit(value)
             break
           case 'rightSpacing':
+            target[key] = value
             this.recyclerView.style['paddingRight'] = formatUnit(value)
             break
           case 'topSpacing':
+            target[key] = value
             this.recyclerView.style['paddingTop'] = formatUnit(value)
             break
           case 'bottomSpacing':
+            target[key] = value
             this.recyclerView.style['paddingBottom'] = formatUnit(value)
             break
           default:
+            target[key] = value
             this.node.style[key] = styleTransformer.transformStyle(value)
             break
         }
