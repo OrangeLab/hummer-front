@@ -10,7 +10,7 @@ import { LongPressEvent, LongPressState } from '../event/LongPressEvent'
 import { ScrollEvent } from '../event/ScrollEvent'
 import { BasicAnimation } from '../BasicAnimation'
 import { KeyframeAnimation } from '../KeyframeAnimation'
-import { formatUnit, getQueryVariable } from '../../common/utils'
+import { formatUnit, getQueryVariable, isEmptyFunction } from '../../common/utils'
 import { isNeedUnitTrasform } from '../../common/style/transformer/unit'
 import { styleTransformer } from '../../common/style'
 export const SIZE_STYLE: Array<any> = [
@@ -151,15 +151,15 @@ export class View {
     [key: string]: { hammer?: any; listener?: Function;[key: string]: any }
   }
   protected animations: { [key: string]: Animation }
-  protected onCreate?: Function // 页面首次加载时触发
-  protected onAppear?: Function // 页面显示
-  protected onDisappear?: Function // 页面隐藏
-  protected onDestroy?: Function // 页面销毁
-  protected onBack?: Function // 页面返回
+  // protected onCreate?: Function // 页面首次加载时触发
+  // protected onAppear?: Function // 页面显示
+  // protected onDisappear?: Function // 页面隐藏
+  // protected onDestroy?: Function // 页面销毁
+  // protected onBack?: Function // 页面返回
   isHighlight?: Boolean
 
   layout!: () => void
-
+  isrender: boolean = false
   constructor(public viewID?: string) {
     let backgroundUrl
     let urlReg = /url\("?'?.((?!\,).)*"?'?\)/g
@@ -179,7 +179,7 @@ export class View {
         set: (target, key, value) => {
           switch (key) {
             case 'flexShrink':
-              if(value === 1){
+              if (value === 1) {
                 this.node.style['overflow'] = 'hidden'
               }
               this.node.style[key] = value
@@ -194,17 +194,24 @@ export class View {
               let newBackgroundColor = value.match(ColorReg)
               let backgroundColor = this.node.style['backgroundImage'].match(ColorReg)
               backgroundUrl = this.node.style['backgroundImage'].match(urlReg)
-              if (backgroundUrl && newBackgroundUrl) {
-                this.node.style['backgroundImage'].replaceAll(urlReg, newBackgroundUrl[0])
-              }
-              if (newBackgroundColor && backgroundColor) {
-                this.node.style['backgroundImage'].replaceAll(ColorReg, newBackgroundColor[0])
-              }
-              if (!backgroundUrl && !backgroundColor) {
-                this.node.style['backgroundImage'] = value
+              if (!newBackgroundUrl && !newBackgroundColor && !backgroundColor) {
+                this.node.style['backgroundImage'] = `url(${value})`
+              } else if (!newBackgroundUrl && !newBackgroundColor && backgroundColor) {
+                this.node.style['backgroundImage'] = `url(${value}),${backgroundColor}`
               } else {
-                this.node.style['backgroundImage'] = `${this.node.style['backgroundImage']},${value}`
+                if (backgroundUrl && newBackgroundUrl) {
+                  this.node.style['backgroundImage'].replaceAll(urlReg, newBackgroundUrl[0])
+                }
+                if (newBackgroundColor && backgroundColor) {
+                  this.node.style['backgroundImage'].replaceAll(ColorReg, newBackgroundColor[0])
+                }
+                if (!backgroundUrl && !backgroundColor) {
+                  this.node.style['backgroundImage'] = value
+                } else {
+                  this.node.style['backgroundImage'] = `${this.node.style['backgroundImage']},${value}`
+                }
               }
+              this.node.style['backgroundSize'] = 'cover'
               break;
             default:
               this.node.style[key] = value
@@ -217,19 +224,20 @@ export class View {
     this.defaultStyle()
     this.initialize()
     window.addEventListener('render-ready', () => {
-      // this.formatBasicAnimation()
-      this?.onCreate && this.onCreate()
-      this?.onAppear && this.onAppear()
-      if (this?.onAppear || this?.onDisappear) {
+      this.formatBasicAnimation();
+      this.isrender = true;
+      !isEmptyFunction(this.onCreate) && this.onCreate()
+      !isEmptyFunction(this.onAppear) && this.onAppear()
+      if (!isEmptyFunction(this.onAppear) || !isEmptyFunction(this.onDisappear)) {
         document.addEventListener("visibilitychange", this.visibilityChange.bind(this));
       }
-      if (this?.onBack) {
+      if (!isEmptyFunction(this.onBack)) {
         if (window.history && window.history.pushState) {
           history.pushState(null, null, document.URL);
           window.addEventListener('popstate', this.interceptBack.bind(this), false);
         }
       }
-      if (this?.onCreate && getQueryVariable('navBar') && this.node.parentNode.tagName === 'BODY') {
+      if (!isEmptyFunction(this.onCreate) && getQueryVariable('navBar') && this.node.parentNode.tagName === 'BODY') {
         let navBar = new View
         let navBarTitle = new View
         let navBarBack = new View
@@ -257,8 +265,7 @@ export class View {
     }
   }
   interceptBack() {
-    console.log('123123');
-    let isIntercept = this?.onBack()
+    let isIntercept = this?.onBack() as unknown as boolean
     if (isIntercept) {
       history.pushState(null, null, document.URL);
     } else {
@@ -266,37 +273,38 @@ export class View {
       history.go(-1);
     }
   }
-  //   /**
-  //    * 页面首次加载时触发
-  //    */
-  //   onCreate() { }
-  //   /**
-  //   * 页面显示周期
-  //   */
-  //   onAppear() { }
-  //   /**
-  //    * 页面隐藏
-  //    */
-  //   onDisappear() { }
-  //   /**
-  //   * 页面销毁
-  //   */
-  //   onDestroy() { }
-  //   /**
-  //  * 页面返回
-  //  */
-  //   onBack() { }
+  /**
+   * 页面首次加载时触发
+   */
+  onCreate() { }
+  /**
+  * 页面显示周期
+  */
+  onAppear() { }
+  /**
+   * 页面隐藏
+   */
+  onDisappear() { }
+  /**
+  * 页面销毁
+  */
+  onDestroy() { }
+  /**
+ * 页面返回
+ */
+  onBack() { }
   private playBasicAnimation(animation) {
     const {
       keyframes,
       options
     } = this.getBasicAnimationKeyFrameAnimationOptions(animation)
     const animate: Animation = this.node.animate(keyframes, options)
-    // this.animations[key] = animate
-    animation.onstart && animation.onstart()
+    animation[0].onstart && animation[0].onstart()
     animate.onfinish = () => {
+      animation.forEach(element => {
+        element.onend && element.onend()
+      });
       this.basicAnimationArray.shift()
-      animation.onend && animation.onend()
       if (this.basicAnimationArray.length >= 1) {
         this.playBasicAnimation(this.basicAnimationArray[this.basicAnimationArray.length - 1])
       }
@@ -308,14 +316,18 @@ export class View {
     let newBasicAnimationArray: Array<Array<any>> = []
     let numSize = -1
     let oldKeyNum
-    this.basicAnimationArray.forEach(item => {
-      let keyNum = parseInt(Object.keys(item)[0].split('_')[Object.keys(item)[0].split('_').length - 2]);
-      if (oldKeyNum !== keyNum) {
-        numSize++
+    this.basicAnimationArray.forEach((item, index) => {
+      if (Object.prototype.toString.call(item) === '[object Array]') {
+        newBasicAnimationArray[0] = item
+      } else {
+        let keyNum = parseInt(Object.keys(item)[0].split('_')[Object.keys(item)[0].split('_').length - 2]);
+        if (oldKeyNum !== keyNum) {
+          numSize++
+        }
+        oldKeyNum = keyNum
+        !newBasicAnimationArray[numSize] && (newBasicAnimationArray[numSize] = [])
+        newBasicAnimationArray[numSize].push(item[Object.keys(item)[0]])
       }
-      oldKeyNum = keyNum
-      !newBasicAnimationArray[numSize] && (newBasicAnimationArray[numSize] = [])
-      newBasicAnimationArray[numSize].push(item[Object.keys(item)[0]])
     });
     this.basicAnimationArray = newBasicAnimationArray
     if (this.basicAnimationArray.length > 0) {
@@ -808,7 +820,9 @@ export class View {
       let a = {}
       a[`${key}`] = animation
       this.basicAnimationArray.push(a);
-      this.formatBasicAnimation();
+      if (this.isrender || document.readyState === 'complete') {
+        this.formatBasicAnimation();
+      }
     } else if (animation instanceof KeyframeAnimation) {
       // 帧动画
       const { keyframes, options } = this.getKeyframeAnimationOptions(animation)
@@ -934,7 +948,7 @@ export class View {
       options: {
         fill: 'forwards',
         easing: ani[0].easing,
-        delay: ani[0].delay || 0,
+        delay: ani[0]?.delay && (ani[0].delay * 1000) || 0,
         direction: 'normal',
         duration: ani[0].duration * 1000,
         iterations: ani[0].repeatCount < 0 ? 'Infinity' : (ani[0].repeatCount === 0 || ani[0].repeatCount === 1 ? 1 : ani[0].repeatCount)
@@ -953,7 +967,7 @@ export class View {
       options: {
         fill: 'forwards',
         easing: ani.easing,
-        delay: ani.delay || 0,
+        delay: ani?.delay && (ani.delay * 1000) || 0,
         direction: 'normal',
         duration: ani.duration * 1000,
         iterations: ani.repeatCount < 0 ? 'Infinity' : (ani.repeatCount === 0 || ani.repeatCount === 1 ? 1 : ani.repeatCount)

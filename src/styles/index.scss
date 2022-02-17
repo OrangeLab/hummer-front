@@ -36,6 +36,16 @@ body {
     flex-shrink: 0;
     border-style: solid;
   }
+
+  /*添加css样式*/
+  input::-webkit-outer-spin-button,
+  input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+  }
+
+  input[type="number"] {
+    -moz-appearance: textfield;
+  }
 }
 
 button {
@@ -78,7 +88,7 @@ button {
   top: 0;
   left: 0;
   background-color: rgba(0, 0, 0, 0.7);
-  z-index: 2000;
+  z-index: 9999;
   height: 100%;
   width: 100%;
 
@@ -172,6 +182,7 @@ button {
   -webkit-transform: translate3d(-50%, -50%, 0);
   transform: translate3d(-50%, -50%, 0);
   transition: opacity 0.5s;
+  z-index: 9999;
 }
 
 .hm-default-button {

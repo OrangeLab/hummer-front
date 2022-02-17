@@ -1,7 +1,7 @@
 import { EventType, View } from '../view/View'
 
 export abstract class Event {
-  public target!: View
+  public target!: View | any
 
   abstract get type(): EventType
 }

@@ -160,7 +160,10 @@ export class Scroller extends View {
         scrollX: false,
         scrollY: true,
         pullUpLoad: this.loadMoreView ? true : false,
-        pullDownRefresh: this.refreshView ? true : false,
+        pullDownRefresh: this.refreshView ? {
+          threshold: this.refreshView?.node?.offsetHeight||40,
+          stop: this.refreshView?.node?.offsetHeight||40
+        } : false,
         click: true,
         dblclick: true,
         scrollbar: this._showScrollBar,
@@ -230,6 +233,7 @@ export class Scroller extends View {
     } else {
       this.bscroll.refresh();
     }
+    console.log(this.bscroll)
   }
 
 

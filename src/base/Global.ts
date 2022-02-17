@@ -69,7 +69,7 @@ export class HummerGlobal {
       this.targetNode = e.target
       this.elementhighlight()
       this.observer.observe(e.target, config);
-      this.observer.observe(scroller, config);
+      scroller&&this.observer.observe(scroller, config);
     }
   }
   private elementhighlight() {
@@ -79,7 +79,7 @@ export class HummerGlobal {
     }
   }
   private getScroller(elem) {
-    if (elem.parentNode.className.indexOf('hm-scroller-content') != -1 || elem.parentNode.className.indexOf('hm-list-content') != -1) {
+    if (elem.parentNode?.className?.indexOf('hm-scroller-content') != -1 || elem.parentNode?.className?.indexOf('hm-list-content') != -1) {
       return elem.parentNode
     } else {
       return this.getScroller(elem.parentNode)
